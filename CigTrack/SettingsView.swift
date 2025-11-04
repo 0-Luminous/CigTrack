@@ -7,6 +7,7 @@ struct SettingsView: View {
     @EnvironmentObject private var appViewModel: AppViewModel
     @ObservedObject var user: User
 
+    @AppStorage("dashboardBackgroundIndex") private var backgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
     @State private var selectedProduct: ProductType = .cigarette
     @State private var dailyLimit: Double = 10
     @State private var accentColor: Color = .accentColor
@@ -34,6 +35,7 @@ struct SettingsView: View {
 
                 Section("Appearance") {
                     ColorPicker("Accent color", selection: $accentColor, supportsOpacity: false)
+                    backgroundSelectionRow
                 }
 
                 Section {
@@ -70,6 +72,58 @@ struct SettingsView: View {
         user.dailyLimit = Int32(dailyLimit)
         context.saveIfNeeded()
         dismiss()
+    }
+}
+
+private extension SettingsView {
+    var backgroundSelectionRow: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Dashboard Background")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(DashboardBackgroundStyle.allCases) { style in
+                        let isSelected = backgroundIndex == style.rawValue
+                        Button {
+                            backgroundIndex = style.rawValue
+                        } label: {
+                            VStack(alignment: .leading, spacing: 8) {
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .fill(style.previewGradient)
+                                    .frame(width: 140, height: 80)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                            .stroke(isSelected ? Color.white : Color.white.opacity(0.4),
+                                                    lineWidth: isSelected ? 3 : 1)
+                                    )
+                                    .overlay(alignment: .topTrailing) {
+                                        if isSelected {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundStyle(.white)
+                                                .shadow(radius: 4)
+                                                .offset(x: -8, y: 8)
+                                        }
+                                    }
+
+                                Text(style.name)
+                                    .font(.footnote.weight(isSelected ? .semibold : .regular))
+                                    .foregroundStyle(isSelected ? .primary : .secondary)
+                                    .lineLimit(1)
+                            }
+                            .frame(width: 140)
+                            .shadow(color: isSelected ? Color.black.opacity(0.25) : .clear,
+                                    radius: isSelected ? 12 : 0,
+                                    y: isSelected ? 8 : 0)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 

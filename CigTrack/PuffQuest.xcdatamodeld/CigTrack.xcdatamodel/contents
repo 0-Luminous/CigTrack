@@ -43,6 +43,9 @@
         <attribute name="coins" optional="NO" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dailyLimit" optional="NO" attributeType="Integer 32" defaultValueString="10" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="packSize" optional="NO" attributeType="Integer 16" defaultValueString="20" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="packCost" optional="NO" attributeType="Double" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="currencyCode" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="displayName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="productType" optional="NO" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES" syncable="YES"/>

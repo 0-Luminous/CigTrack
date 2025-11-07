@@ -48,3 +48,103 @@
 "Settings" = "Настройки";
 "Adventurer" = "Искатель";
 "Save" = "Сохранить";
+
+/* Онбординг */
+"onboarding_welcome_title" = "Добро пожаловать в %@";
+"onboarding_welcome_subtitle" = "Отслеживай никотин, расходы и прогресс в одном месте.";
+"onboarding_primary_cta" = "Поехали";
+"onboarding_primary_cta_hint" = "Откроет выбор способа";
+"onboarding_method_title" = "Выбери способ";
+"onboarding_method_card_hint" = "Открывает форму параметров";
+"onboarding_method_cigarettes" = "Сигареты";
+"onboarding_method_disposable_vape" = "Одноразовый вейп";
+"onboarding_method_refillable_vape" = "Заправляемый вейп";
+"onboarding_method_heated_tobacco" = "Нагреваемый табак";
+"onboarding_method_snus_or_pouches" = "Снюс / пакетики";
+"onboarding_section_currency" = "Валюта";
+"onboarding_currency_picker_title" = "Предпочитаемая валюта";
+"onboarding_section_consumption" = "Потребление";
+"onboarding_section_cost" = "Стоимость";
+"onboarding_validation_section" = "Проверка";
+"onboarding_warning_section" = "Предупреждения";
+"onboarding_helper_section" = "Подсказки";
+"onboarding_continue" = "Продолжить";
+"back_button" = "Назад";
+
+"cigarettes_per_day_title" = "Сколько сигарет в день?";
+"cigarettes_per_day_subtitle" = "Укажи среднее значение для расчёта базы.";
+"cigarettes_per_day_range" = "Допустимо: 1-99.";
+"cigarettes_per_pack_title" = "Сигарет в пачке";
+"cigarettes_per_pack_subtitle" = "Чаще всего 20 штук.";
+"cigarettes_per_pack_range" = "Допустимо: 10-40.";
+"pack_price_title" = "Цена пачки";
+"pack_price_placeholder" = "Напр.: 7.50";
+"pack_price_tip" = "Возьми привычную цену, чтобы посчитать стоимость сигареты.";
+
+"puffs_per_device_title" = "Затяжек в устройстве";
+"puffs_per_device_subtitle" = "Посмотри цифру на коробке.";
+"puffs_per_device_range" = "Допустимо: 600-10000.";
+"device_price_title" = "Цена устройства";
+"device_price_placeholder" = "Напр.: 12.99";
+"device_price_tip" = "Нужно, чтобы оценить стоимость 100 затяжек.";
+
+"liquid_volume_title" = "Объём флакона (мл)";
+"liquid_volume_subtitle" = "Общее количество жидкости.";
+"liquid_volume_range" = "Допустимо: 10-120.";
+"nicotine_strength_title" = "Крепость (мг/мл)";
+"nicotine_strength_subtitle" = "Как указано на этикетке.";
+"nicotine_strength_range" = "Допустимо: 1-60.";
+"puffs_per_ml_title" = "Затяжек на 1 мл";
+"puffs_per_ml_subtitle" = "Используй свой опыт или подсказку устройства.";
+"puffs_per_ml_range" = "Допустимо: 10-30.";
+"liquid_price_title" = "Цена флакона";
+"liquid_price_placeholder" = "Напр.: 15.00";
+"coil_price_toggle" = "Добавить цену койла";
+"coil_price_title" = "Цена койла";
+"coil_price_placeholder" = "Напр.: 5.00";
+"refillable_price_tip" = "Суммируем жидкость и койл, чтобы посчитать дневные траты.";
+
+"heated_daily_sticks_title" = "Стики в день";
+"heated_daily_sticks_subtitle" = "Среднее количество за день.";
+"heated_daily_sticks_range" = "Значение должно быть больше нуля.";
+"heated_sticks_per_pack_title" = "Стиков в пачке";
+"heated_sticks_per_pack_subtitle" = "Обычно 20 штук.";
+"heated_sticks_per_pack_range" = "Укажи точное число из пачки.";
+"heated_pack_price_title" = "Цена пачки";
+"heated_pack_price_placeholder" = "Напр.: 7.00";
+
+"snus_daily_title" = "Пакетиков в день";
+"snus_daily_subtitle" = "Среднее значение.";
+"snus_daily_range" = "Используй реальное положительное число.";
+"snus_per_can_title" = "Пакетиков в банке";
+"snus_per_can_subtitle" = "Указано на банке.";
+"snus_per_can_range" = "Сколько пакетиков в одной банке.";
+"snus_can_price_title" = "Цена банки";
+"snus_can_price_placeholder" = "Напр.: 6.50";
+
+"hint_price_per_cigarette" = "≈ цена за сигарету: %@";
+"hint_price_per_100_puffs" = "Стоимость 100 затяжек: %@";
+"hint_refillable_price_per_100" = "Жидкость за 100 затяжек: %@";
+"hint_refillable_daily_cost" = "Дневная стоимость (%d затяжек): %@";
+"hint_heated_price_per_stick" = "≈ цена за стик: %@";
+"hint_snus_price_per_pouch" = "≈ цена за пакетик: %@";
+
+"validation_cigarettes_per_day" = "Сигарет в день должно быть от 1 до 99.";
+"validation_cigarettes_per_pack" = "В пачке может быть только 10-40 сигарет.";
+"validation_pack_price_positive" = "Цена пачки должна быть больше нуля.";
+"warning_cigarettes_high_consumption" = "Количество в день больше двух пачек. Убедись, что всё верно.";
+"validation_puffs_range" = "Укажи 600-10000 затяжек в устройстве.";
+"validation_device_price_positive" = "Цена устройства должна быть больше нуля.";
+"validation_liquid_volume" = "Объём флакона должен быть от 10 до 120 мл.";
+"validation_liquid_price_positive" = "Цена флакона должна быть больше нуля.";
+"validation_nicotine_strength" = "Крепость должна быть от 1 до 60 мг/мл.";
+"validation_coil_price_positive" = "Цена койла не может быть отрицательной.";
+"validation_estimated_puffs" = "Оценка затяжек на 1 мл должна быть 10-30.";
+"validation_sticks_per_pack" = "Укажи, сколько стиков в пачке.";
+"validation_daily_sticks_positive" = "Стики в день должны быть больше нуля.";
+"validation_pouches_per_can" = "Укажи, сколько пакетиков в банке.";
+"validation_can_price_positive" = "Цена банки должна быть больше нуля.";
+"validation_daily_pouches_positive" = "Пакетики в день должны быть больше нуля.";
+
+"error_no_method_selected" = "Выбери способ употребления, чтобы продолжить.";
+"error_invalid_form" = "Исправь отмеченные поля, чтобы продолжить.";

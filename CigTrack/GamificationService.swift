@@ -145,14 +145,21 @@ final class GamificationService {
     }
 
     func estimatedMoneySaved(user: User) -> Int64 {
-        // Placeholder: assume each entry costs 15 units and limit savings is difference.
+        // Estimate savings using user-provided pack cost when available.
         let type = user.product.entryType
         let stats = StatsService(context: context)
         let totals = stats.totalsForLastDays(user: user, days: 30, type: type)
         let average = totals.values.reduce(0, +) / max(1, totals.count)
-        let baseCostPerUnit = type == .cig ? 15.0 : 8.0
-        let baseline = Double(user.dailyLimit) * baseCostPerUnit
-        let actual = Double(average) * baseCostPerUnit
+
+        let inferredCostPerUnit: Double
+        if type == .cig, user.packSize > 0, user.packCost > 0 {
+            inferredCostPerUnit = user.packCost / Double(user.packSize)
+        } else {
+            inferredCostPerUnit = type == .cig ? 15.0 : 8.0
+        }
+
+        let baseline = Double(user.dailyLimit) * inferredCostPerUnit
+        let actual = Double(average) * inferredCostPerUnit
         let saved = max(0, baseline - actual)
         return Int64(saved * 30)
     }

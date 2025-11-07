@@ -16,11 +16,28 @@ final class TrackingService {
         entry.id = UUID()
         entry.createdAt = date
         entry.type = type.rawValue
-        entry.cost = cost ?? 0
+        entry.cost = resolvedCost(for: user, explicitCost: cost, type: type)
         entry.user = user
 
         statsService.bumpDailyCount(for: user, at: date, type: type)
         gamification.onEntryAdded(user: user, at: date)
         context.saveIfNeeded()
+    }
+
+    private func resolvedCost(for user: User, explicitCost: Double?, type: EntryType) -> Double {
+        if let explicitCost {
+            return explicitCost
+        }
+
+        guard type == .cig else {
+            return 0
+        }
+
+        let packSize = max(Int(user.packSize), 0)
+        let packCost = user.packCost
+        guard packSize > 0, packCost > 0 else {
+            return 0
+        }
+        return packCost / Double(packSize)
     }
 }

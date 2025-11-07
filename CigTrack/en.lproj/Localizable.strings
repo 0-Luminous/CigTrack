@@ -48,3 +48,103 @@
 "Settings" = "Settings";
 "Adventurer" = "Adventurer";
 "Save" = "Save";
+
+/* Onboarding */
+"onboarding_welcome_title" = "Welcome to %@";
+"onboarding_welcome_subtitle" = "Track nicotine, spending, and progress in one place.";
+"onboarding_primary_cta" = "Get started";
+"onboarding_primary_cta_hint" = "Opens nicotine method selection";
+"onboarding_method_title" = "Choose your method";
+"onboarding_method_card_hint" = "Opens detailed setup";
+"onboarding_method_cigarettes" = "Cigarettes";
+"onboarding_method_disposable_vape" = "Disposable vape";
+"onboarding_method_refillable_vape" = "Refillable vape";
+"onboarding_method_heated_tobacco" = "Heated tobacco";
+"onboarding_method_snus_or_pouches" = "Snus or pouches";
+"onboarding_section_currency" = "Currency";
+"onboarding_currency_picker_title" = "Preferred currency";
+"onboarding_section_consumption" = "Consumption";
+"onboarding_section_cost" = "Cost";
+"onboarding_validation_section" = "Validation";
+"onboarding_warning_section" = "Warnings";
+"onboarding_helper_section" = "Tips";
+"onboarding_continue" = "Continue";
+"back_button" = "Back";
+
+"cigarettes_per_day_title" = "How many cigarettes per day?";
+"cigarettes_per_day_subtitle" = "Tell us the average day to set your baseline.";
+"cigarettes_per_day_range" = "Allowed range: 1-99.";
+"cigarettes_per_pack_title" = "Cigarettes per pack";
+"cigarettes_per_pack_subtitle" = "Most packs include 20 sticks.";
+"cigarettes_per_pack_range" = "Allowed range: 10-40.";
+"pack_price_title" = "Pack price";
+"pack_price_placeholder" = "Ex: 7.50";
+"pack_price_tip" = "Use your usual store price to calculate per-cigarette costs.";
+
+"puffs_per_device_title" = "Puffs per device";
+"puffs_per_device_subtitle" = "Check the number printed on the box.";
+"puffs_per_device_range" = "Allowed range: 600-10000.";
+"device_price_title" = "Device price";
+"device_price_placeholder" = "Ex: 12.99";
+"device_price_tip" = "Helps estimate the cost per 100 puffs.";
+
+"liquid_volume_title" = "Bottle volume (ml)";
+"liquid_volume_subtitle" = "Total milliliters in the bottle.";
+"liquid_volume_range" = "Allowed range: 10-120.";
+"nicotine_strength_title" = "Nicotine strength (mg/ml)";
+"nicotine_strength_subtitle" = "Printed on the label.";
+"nicotine_strength_range" = "Allowed range: 1-60.";
+"puffs_per_ml_title" = "Estimated puffs per ml";
+"puffs_per_ml_subtitle" = "Use your own estimate or the device guide.";
+"puffs_per_ml_range" = "Allowed range: 10-30.";
+"liquid_price_title" = "Bottle price";
+"liquid_price_placeholder" = "Ex: 15.00";
+"coil_price_toggle" = "Add coil price";
+"coil_price_title" = "Coil price";
+"coil_price_placeholder" = "Ex: 5.00";
+"refillable_price_tip" = "We combine liquid and coil cost to estimate daily spending.";
+
+"heated_daily_sticks_title" = "Daily sticks";
+"heated_daily_sticks_subtitle" = "Average sticks consumed per day.";
+"heated_daily_sticks_range" = "Keep it above zero for better stats.";
+"heated_sticks_per_pack_title" = "Sticks per pack";
+"heated_sticks_per_pack_subtitle" = "Most packs include 20 sticks.";
+"heated_sticks_per_pack_range" = "Enter the exact number in your pack.";
+"heated_pack_price_title" = "Pack price";
+"heated_pack_price_placeholder" = "Ex: 7.00";
+
+"snus_daily_title" = "Daily pouches";
+"snus_daily_subtitle" = "Average number consumed per day.";
+"snus_daily_range" = "Use a realistic positive number.";
+"snus_per_can_title" = "Pouches per can";
+"snus_per_can_subtitle" = "Printed on the can.";
+"snus_per_can_range" = "Enter the total pouches in one can.";
+"snus_can_price_title" = "Can price";
+"snus_can_price_placeholder" = "Ex: 6.50";
+
+"hint_price_per_cigarette" = "Approximate price per cigarette: %@";
+"hint_price_per_100_puffs" = "Cost per 100 puffs: %@";
+"hint_refillable_price_per_100" = "Liquid cost per 100 puffs: %@";
+"hint_refillable_daily_cost" = "Estimated daily cost (%d puffs): %@";
+"hint_heated_price_per_stick" = "Approximate price per stick: %@";
+"hint_snus_price_per_pouch" = "Approximate price per pouch: %@";
+
+"validation_cigarettes_per_day" = "Daily cigarettes must be between 1 and 99.";
+"validation_cigarettes_per_pack" = "Pack size must be between 10 and 40.";
+"validation_pack_price_positive" = "Pack price must be greater than 0.";
+"warning_cigarettes_high_consumption" = "Your daily amount is more than twice the pack size. Make sure this is intentional.";
+"validation_puffs_range" = "Enter 600-10000 puffs per device.";
+"validation_device_price_positive" = "Device price must be greater than 0.";
+"validation_liquid_volume" = "Bottle volume must be between 10 and 120 ml.";
+"validation_liquid_price_positive" = "Bottle price must be greater than 0.";
+"validation_nicotine_strength" = "Nicotine strength must be between 1 and 60 mg/ml.";
+"validation_coil_price_positive" = "Coil price cannot be negative.";
+"validation_estimated_puffs" = "Estimated puffs per ml must be between 10 and 30.";
+"validation_sticks_per_pack" = "Enter how many sticks are in one pack.";
+"validation_daily_sticks_positive" = "Daily sticks must be greater than 0.";
+"validation_pouches_per_can" = "Enter how many pouches are in one can.";
+"validation_can_price_positive" = "Can price must be greater than 0.";
+"validation_daily_pouches_positive" = "Daily pouches must be greater than 0.";
+
+"error_no_method_selected" = "Select a nicotine method to continue.";
+"error_invalid_form" = "Please fix the highlighted fields before continuing.";

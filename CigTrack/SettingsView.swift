@@ -10,18 +10,9 @@ struct SettingsView: View {
     @AppStorage("dashboardBackgroundIndex") private var backgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
     @State private var selectedProduct: ProductType = .cigarette
     @State private var dailyLimit: Double = 10
-    @State private var accentColor: Color = .accentColor
-
     var body: some View {
         NavigationStack {
             Form {
-                Section("Profile") {
-                    TextField("Display name", text: Binding(
-                        get: { user.displayName ?? "" },
-                        set: { user.displayName = $0 }
-                    ))
-                }
-
                 Section("Tracking") {
                     Picker("Product type", selection: $selectedProduct) {
                         ForEach(ProductType.allCases) { type in
@@ -34,7 +25,6 @@ struct SettingsView: View {
                 }
 
                 Section("Appearance") {
-                    ColorPicker("Accent color", selection: $accentColor, supportsOpacity: false)
                     backgroundSelectionRow
                 }
 

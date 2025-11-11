@@ -31,6 +31,15 @@ final class StatsService {
         stat.count += 1
     }
 
+    func decrementDailyCount(for user: User, at date: Date, type: EntryType) {
+        let sod = startOfDay(for: date)
+        guard let stat = fetchDailyStat(user: user, date: sod, type: type) else { return }
+        stat.count = max(stat.count - 1, Int32(0))
+        if stat.count == 0 {
+            context.delete(stat)
+        }
+    }
+
     func countForDay(user: User, date: Date, type: EntryType) -> Int {
         let sod = startOfDay(for: date)
         let req: NSFetchRequest<DailyStat> = DailyStat.fetchRequest()

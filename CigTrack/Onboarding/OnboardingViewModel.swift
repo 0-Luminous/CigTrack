@@ -3,6 +3,7 @@ import Combine
 
 @MainActor
 final class OnboardingViewModel: ObservableObject {
+    @Published var selectedMode: OnboardingMode = .tracking
     @Published var selectedMethod: NicotineMethod?
     @Published var cigarettesConfig: CigarettesConfig
     @Published var disposableVapeConfig: DisposableVapeConfig

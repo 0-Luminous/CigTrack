@@ -141,9 +141,9 @@ struct MainDashboardView: View {
 private extension MainDashboardView {
     var holdButton: some View {
         ZStack {
-            
+
             Circle()
-                .fill(Color.white)
+                .fill(holdOverlayColor)
                 .scaleEffect(max(holdProgress, 0.001))
                 .opacity(holdProgress > 0 ? 0.9 : 0)
                 .blendMode(.plusLighter)
@@ -187,6 +187,10 @@ private extension MainDashboardView {
 
     var circleGradient: RadialGradient {
         backgroundStyle.circleGradient
+    }
+
+    var holdOverlayColor: Color {
+        .red
     }
 
     var remainingLabel: String {
@@ -354,8 +358,9 @@ private extension MainDashboardView {
             holdProgress = 1
         }
 
-        logEntry()
-        hapticTrigger += 1
+        if removeEntry() {
+            hapticTrigger += 1
+        }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
             withAnimation(.easeInOut(duration: 0.3)) {
@@ -390,10 +395,14 @@ private extension MainDashboardView {
 // MARK: - Actions
 
 private extension MainDashboardView {
-    func logEntry() {
+    @discardableResult
+    func removeEntry() -> Bool {
         let tracker = TrackingService(context: context)
-        tracker.addEntry(for: user, type: entryType)
-        refreshToday(reference: Date())
+        let removed = tracker.removeLatestEntry(for: user, type: entryType, referenceDate: Date())
+        if removed {
+            refreshToday(reference: Date())
+        }
+        return removed
     }
 
     func refreshToday(reference: Date) {

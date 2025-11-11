@@ -54,6 +54,15 @@
 "onboarding_welcome_subtitle" = "Track nicotine, spending, and progress in one place.";
 "onboarding_primary_cta" = "Get started";
 "onboarding_primary_cta_hint" = "Opens nicotine method selection";
+"onboarding_mode_picker_title" = "Choose your mode";
+"onboarding_mode_picker_subtitle" = "Swipe to match how you plan to use the app.";
+"onboarding_mode_swipe_hint" = "Swipe left or right to explore each mode.";
+"onboarding_mode_tracking_title" = "Tracking";
+"onboarding_mode_tracking_description" = "Log every cigarette or puff and keep a clear picture of spending.";
+"onboarding_mode_gradual_title" = "Gradual reduction";
+"onboarding_mode_gradual_description" = "Set gentle limits, watch trends, and slowly bring the daily count down.";
+"onboarding_mode_quit_title" = "Quit right now";
+"onboarding_mode_quit_description" = "Go all in with zero tolerance and stay focused on becoming nicotine-free.";
 "onboarding_method_title" = "Choose your method";
 "onboarding_method_card_hint" = "Opens detailed setup";
 "onboarding_method_cigarettes" = "Cigarettes";
@@ -69,6 +78,10 @@
 "onboarding_warning_section" = "Warnings";
 "onboarding_helper_section" = "Tips";
 "onboarding_continue" = "Continue";
+"onboarding_welcome_hint" = "Swipe or tap later to finish setup anytime in settings.";
+"onboarding_step_one" = "Step 1";
+"onboarding_method_card_hint_copy" = "Choose what you want to keep an eye on first.";
+"onboarding_currency_search_placeholder" = "Search currency";
 "back_button" = "Back";
 
 "cigarettes_per_day_title" = "How many cigarettes per day?";
@@ -148,3 +161,8 @@
 
 "error_no_method_selected" = "Select a nicotine method to continue.";
 "error_invalid_form" = "Please fix the highlighted fields before continuing.";
+"onboarding_method_cigarettes_desc" = "Daily cigarettes, pack price, per-stick insights.";
+"onboarding_method_disposable_vape_desc" = "Track puff count and device cost.";
+"onboarding_method_refillable_vape_desc" = "Log liquid volume, nicotine strength, coils.";
+"onboarding_method_heated_tobacco_desc" = "Monitor stick packs and daily habits.";
+"onboarding_method_snus_or_pouches_desc" = "Keep cans, price, and pouch usage in sync.";

@@ -1,4 +1,39 @@
 import Foundation
+import SwiftUI
+
+// MARK: - Onboarding Modes
+
+enum OnboardingMode: String, CaseIterable, Identifiable {
+    case tracking
+    case gradualReduction
+    case quitNow
+
+    var id: String { rawValue }
+
+    var titleKey: LocalizedStringKey {
+        switch self {
+        case .tracking: return "onboarding_mode_tracking_title"
+        case .gradualReduction: return "onboarding_mode_gradual_title"
+        case .quitNow: return "onboarding_mode_quit_title"
+        }
+    }
+
+    var subtitleKey: LocalizedStringKey {
+        switch self {
+        case .tracking: return "onboarding_mode_tracking_description"
+        case .gradualReduction: return "onboarding_mode_gradual_description"
+        case .quitNow: return "onboarding_mode_quit_description"
+        }
+    }
+
+    var backgroundImageName: String {
+        switch self {
+        case .tracking: return "tracking"
+        case .gradualReduction: return "Reduce"
+        case .quitNow: return "quit"
+        }
+    }
+}
 
 // MARK: - Core Models
 
@@ -21,13 +56,13 @@ enum NicotineMethod: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    var iconSystemName: String {
+    var iconAssetName: String {
         switch self {
-        case .cigarettes: return "flame.fill"
-        case .disposableVape: return "wind"
-        case .refillableVape: return "drop.triangle.fill"
-        case .heatedTobacco: return "leaf.fill"
-        case .snusOrPouches: return "capsule"
+        case .cigarettes: return "Cigarette"
+        case .disposableVape: return "Disposable vape"
+        case .refillableVape: return "RefillableVape"
+        case .heatedTobacco: return "HeatingDevice"
+        case .snusOrPouches: return "SnusPouch"
         }
     }
 }

@@ -24,6 +24,26 @@ final class TrackingService {
         context.saveIfNeeded()
     }
 
+    @discardableResult
+    func removeLatestEntry(for user: User, type: EntryType, referenceDate: Date = Date()) -> Bool {
+        let startOfDay = statsService.startOfDay(for: referenceDate)
+        let endOfDay = statsService.endOfDay(for: referenceDate)
+
+        let request: NSFetchRequest<Entry> = Entry.fetchRequest()
+        request.fetchLimit = 1
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Entry.createdAt, ascending: false)]
+        request.predicate = NSPredicate(format: "user == %@ AND type == %d AND createdAt >= %@ AND createdAt < %@",
+                                        user, type.rawValue, startOfDay as NSDate, endOfDay as NSDate)
+
+        guard let entry = try? context.fetch(request).first else { return false }
+
+        let removalDate = entry.createdAt ?? referenceDate
+        context.delete(entry)
+        statsService.decrementDailyCount(for: user, at: removalDate, type: type)
+        context.saveIfNeeded()
+        return true
+    }
+
     private func resolvedCost(for user: User, explicitCost: Double?, type: EntryType) -> Double {
         if let explicitCost {
             return explicitCost

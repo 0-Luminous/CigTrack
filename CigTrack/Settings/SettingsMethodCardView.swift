@@ -43,10 +43,14 @@ struct SettingsMethodCardView: View {
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Active method")
-                            .font(.caption.weight(.semibold))
+                            .font(.caption2.weight(.semibold))
                             .textCase(.uppercase)
-                            .tracking(1)
-                            .foregroundStyle(secondaryTextColor)
+                            .tracking(1.8)
+                            .foregroundStyle(.white.opacity(0.85))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 4)
+                            .glassEffect(.clear)
+                            
 
                         Text(LocalizedStringKey(method.localizationKey))
                             .font(.title3.weight(.semibold))

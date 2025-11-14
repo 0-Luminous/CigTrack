@@ -28,6 +28,9 @@ struct ModeSpotlightCardView: View {
                     highlightRow
                 }
                 .padding(24)
+
+                arrowIndicator
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
             }
             .clipShape(shape)
             .overlay(shape.strokeBorder(Color.white.opacity(0.22), lineWidth: 1))
@@ -37,9 +40,6 @@ struct ModeSpotlightCardView: View {
                     .blur(radius: 4)
                     .opacity(0.7)
             )
-            .overlay(alignment: .topTrailing) {
-                arrowIndicator
-            }
             .shadow(color: mode.spotlightAccentGradient.shadow.opacity(0.25), radius: 24, x: 0, y: 16)
         }
         .buttonStyle(.plain)
@@ -57,11 +57,7 @@ struct ModeSpotlightCardView: View {
                     .foregroundStyle(.white.opacity(0.85))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 4)
-                    .background(Color.white.opacity(0.12), in: Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(Color.white.opacity(0.25), lineWidth: 0.8)
-                    )
+                    .glassEffect(.clear)
 
                 Text(mode.titleKey)
                     .font(.title3.weight(.bold))
@@ -102,11 +98,7 @@ struct ModeSpotlightCardView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(
-                        mode.spotlightAccentGradient.gradient
-                            .opacity(0.9),
-                        in: Capsule()
-                    )
+                    .glassEffect(.clear)
                     .overlay(
                         Capsule()
                             .stroke(Color.white.opacity(0.25))
@@ -126,16 +118,8 @@ struct ModeSpotlightCardView: View {
 
     private var arrowIndicator: some View {
         Circle()
-            .fill(.white.opacity(0.1))
-            .background(
-                Circle()
-                    .fill(.ultraThinMaterial)
-            )
+            .glassEffect(.clear)           
             .frame(width: 46, height: 46)
-            .overlay(
-                Circle()
-                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
-            )
             .overlay(
                 Image(systemName: "arrow.right")
                     .font(.system(size: 18, weight: .semibold))

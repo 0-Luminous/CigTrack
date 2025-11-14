@@ -3,8 +3,12 @@ import CoreData
 
 struct CalendarScreen: View {
     @Environment(\.managedObjectContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var user: User
-    @AppStorage("dashboardBackgroundIndex") private var backgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexDark") private var backgroundIndexDark: Int = DashboardBackgroundStyle.defaultDark.rawValue
+    @AppStorage("appearanceStylesMigrated") private var appearanceStylesMigrated = false
 
     @State private var monthAnchor: Date = Calendar.current.startOfMonth(for: Date())
     @State private var selectedDay: DaySelection?
@@ -14,11 +18,23 @@ struct CalendarScreen: View {
     private var entryType: EntryType { user.product.entryType }
     private var limit: Int { Int(user.dailyLimit) }
     private var backgroundStyle: DashboardBackgroundStyle {
-        DashboardBackgroundStyle(rawValue: backgroundIndex) ?? .default
+        style(for: colorScheme)
     }
     private var backgroundGradient: LinearGradient { backgroundStyle.backgroundGradient }
     private var primaryTextColor: Color { backgroundStyle.primaryTextColor }
     private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor }
+    private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
+        ensureAppearanceMigration()
+        let index = scheme == .dark ? backgroundIndexDark : backgroundIndexLight
+        return DashboardBackgroundStyle(rawValue: index) ?? DashboardBackgroundStyle.default(for: scheme)
+    }
+
+    private func ensureAppearanceMigration() {
+        guard !appearanceStylesMigrated else { return }
+        backgroundIndexLight = legacyBackgroundIndex
+        backgroundIndexDark = legacyBackgroundIndex
+        appearanceStylesMigrated = true
+    }
 
     var body: some View {
         ZStack {
@@ -85,7 +101,7 @@ struct CalendarScreen: View {
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.white.opacity(0.12), in: Capsule())
+                    // .background(Color.white.opacity(0.12), in: Capsule())
                 }
                 .buttonStyle(.plain)
                 .tint(primaryTextColor)
@@ -102,7 +118,7 @@ struct CalendarScreen: View {
                 VStack {
                     Picker("Year", selection: $pendingYearSelection) {
                         ForEach(yearOptions, id: \.self) { year in
-                            Text("\(year)")
+                            Text(String(year)) // Avoid locale-based digit grouping like 2.025
                                 .tag(year)
                         }
                     }
@@ -231,24 +247,26 @@ private struct CalendarDayCell: View {
                 Text("\(count)")
                     .font(.headline)
                     .foregroundStyle(color)
-                    .frame(maxWidth: .infinity)
+                    // .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
+                    .padding(.horizontal, 3)
                     .background(
                         LinearGradient(
                             colors: [color.opacity(0.14), color.opacity(0.28)],
                             startPoint: .top, endPoint: .bottom
                         )
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .clipShape(Capsule())
 
                 // Subtle progress bar against limit
                 ProgressView(value: min(Double(count), Double(max(limit, 1))), total: Double(max(limit, 1)))
                     .progressViewStyle(LinearProgressViewStyle())
                     .tint(color)
                     .scaleEffect(x: 1, y: 0.75, anchor: .center)
+                    .padding(.horizontal, 5)
             }
         }
-        .padding(12)
+        // .padding(12)
         .frame(height: 96)
         .background(
             cardShape
@@ -256,7 +274,7 @@ private struct CalendarDayCell: View {
         )
         .overlay(
             cardShape
-                .strokeBorder(isToday ? Color.accentColor.opacity(0.9) : Color.white.opacity(0.12), lineWidth: isToday ? 2 : 1)
+                .strokeBorder(isToday ? Color.white : Color.white.opacity(0.12), lineWidth: isToday ? 2 : 1)
         )
         .clipShape(cardShape)
         .glassEffect(.clear)
@@ -431,13 +449,17 @@ private struct WeekdayHeader: View {
 private struct DailyDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var user: User
     let date: Date
     let entryType: EntryType
     private let methodLabel: String?
 
     @FetchRequest private var entries: FetchedResults<Entry>
-    @AppStorage("dashboardBackgroundIndex") private var backgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexDark") private var backgroundIndexDark: Int = DashboardBackgroundStyle.defaultDark.rawValue
+    @AppStorage("appearanceStylesMigrated") private var appearanceStylesMigrated = false
 
     init(user: User, date: Date, entryType: EntryType) {
         self.user = user
@@ -527,11 +549,24 @@ private struct DailyDetailSheet: View {
     }
 
     private var backgroundStyle: DashboardBackgroundStyle {
-        DashboardBackgroundStyle(rawValue: backgroundIndex) ?? .default
+        style(for: colorScheme)
     }
 
     private var backgroundGradient: LinearGradient {
         backgroundStyle.backgroundGradient
+    }
+
+    private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
+        ensureAppearanceMigration()
+        let index = scheme == .dark ? backgroundIndexDark : backgroundIndexLight
+        return DashboardBackgroundStyle(rawValue: index) ?? DashboardBackgroundStyle.default(for: scheme)
+    }
+
+    private func ensureAppearanceMigration() {
+        guard !appearanceStylesMigrated else { return }
+        backgroundIndexLight = legacyBackgroundIndex
+        backgroundIndexDark = legacyBackgroundIndex
+        appearanceStylesMigrated = true
     }
 }
 

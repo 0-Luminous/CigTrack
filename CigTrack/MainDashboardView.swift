@@ -5,9 +5,13 @@ import UIKit
 
 struct MainDashboardView: View {
     @Environment(\.managedObjectContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var user: User
 
-    @AppStorage("dashboardBackgroundIndex") private var backgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexDark") private var backgroundIndexDark: Int = DashboardBackgroundStyle.defaultDark.rawValue
+    @AppStorage("appearanceStylesMigrated") private var appearanceStylesMigrated = false
 
     @State private var todayCount: Int = 0
     @State private var nextSuggestedDate: Date?
@@ -35,7 +39,7 @@ struct MainDashboardView: View {
     private var entryType: EntryType { user.product.entryType }
     private var dailyLimit: Int { max(Int(user.dailyLimit), 0) }
     private var backgroundStyle: DashboardBackgroundStyle {
-        DashboardBackgroundStyle(rawValue: backgroundIndex) ?? .default
+        style(for: colorScheme)
     }
 
     private let clock = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -249,6 +253,19 @@ private extension MainDashboardView {
 // MARK: - Computed Values
 
 private extension MainDashboardView {
+    private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
+        ensureAppearanceMigration()
+        let index = scheme == .dark ? backgroundIndexDark : backgroundIndexLight
+        return DashboardBackgroundStyle(rawValue: index) ?? DashboardBackgroundStyle.default(for: scheme)
+    }
+
+    private func ensureAppearanceMigration() {
+        guard !appearanceStylesMigrated else { return }
+        backgroundIndexLight = legacyBackgroundIndex
+        backgroundIndexDark = legacyBackgroundIndex
+        appearanceStylesMigrated = true
+    }
+
     var buttonScale: CGFloat {
         let holdScale: CGFloat = isHolding ? 0.95 : 1.0
         return breathingScale * holdScale
@@ -264,27 +281,27 @@ private extension MainDashboardView {
 
     var statCardBackgroundColor: Color {
         switch backgroundStyle {
-        case .sunrise, .amber:
+        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
             return Color.white.opacity(0.55)
-        case .ocean, .forest, .midnight:
+        default:
             return Color.white.opacity(0.12)
         }
     }
 
     var statCardBorderColor: Color {
         switch backgroundStyle {
-        case .sunrise, .amber:
+        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
             return Color.black.opacity(0.08)
-        case .ocean, .forest, .midnight:
+        default:
             return Color.white.opacity(0.28)
         }
     }
 
     var statCardShadowColor: Color {
         switch backgroundStyle {
-        case .sunrise, .amber:
+        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
             return Color.black.opacity(0.15)
-        case .ocean, .forest, .midnight:
+        default:
             return Color.black.opacity(0.35)
         }
     }

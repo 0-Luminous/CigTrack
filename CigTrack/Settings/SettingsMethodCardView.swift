@@ -59,7 +59,6 @@ struct SettingsMethodCardView: View {
                     .foregroundStyle(secondaryTextColor)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer()
             Image(systemName: "arrow.right.circle.fill")
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(primaryTextColor, primaryTextColor.opacity(0.6))

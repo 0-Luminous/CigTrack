@@ -4,8 +4,12 @@ import Charts
 
 struct StatsScreen: View {
     @Environment(\.managedObjectContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var user: User
-    @AppStorage("dashboardBackgroundIndex") private var backgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexDark") private var backgroundIndexDark: Int = DashboardBackgroundStyle.defaultDark.rawValue
+    @AppStorage("appearanceStylesMigrated") private var appearanceStylesMigrated = false
 
     private let metricColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
 
@@ -14,7 +18,20 @@ struct StatsScreen: View {
     @State private var financialOverview: FinancialOverview = .placeholder
 
     private var backgroundStyle: DashboardBackgroundStyle {
-        DashboardBackgroundStyle(rawValue: backgroundIndex) ?? .default
+        style(for: colorScheme)
+    }
+
+    private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
+        ensureAppearanceMigration()
+        let index = scheme == .dark ? backgroundIndexDark : backgroundIndexLight
+        return DashboardBackgroundStyle(rawValue: index) ?? DashboardBackgroundStyle.default(for: scheme)
+    }
+
+    private func ensureAppearanceMigration() {
+        guard !appearanceStylesMigrated else { return }
+        backgroundIndexLight = legacyBackgroundIndex
+        backgroundIndexDark = legacyBackgroundIndex
+        appearanceStylesMigrated = true
     }
 
     var body: some View {

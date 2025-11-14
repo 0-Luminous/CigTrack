@@ -2,6 +2,17 @@
 "Cigarettes" = "Cigarettes";
 "+ Puff" = "+ Puff";
 "+ Cigarette" = "+ Cigarette";
+"Time since last use" = "Time since last use";
+"Best nicotine-free streak" = "Best nicotine-free streak";
+"Start logging to enable the timer" = "Start logging to enable the timer.";
+"No record yet" = "No record yet";
+"<1m" = "<1m";
+"%1$@ LEFT TODAY: %2$d/%3$d" = "%1$@ LEFT TODAY: %2$d/%3$d";
+"Next at: anytime" = "Next at: anytime";
+"Next at: now" = "Next at: now";
+"Next at: %@" = "Next at: %@";
+"CIGARETTES" = "CIGARETTES";
+"PUFFS" = "PUFFS";
 "Welcome to PuffQuest" = "Welcome to PuffQuest";
 "Choose your track" = "Choose your track";
 "Set a daily limit" = "Set a daily limit";
@@ -36,6 +47,29 @@
 "XP" = "XP";
 "Coins" = "Coins";
 "Streaks" = "Streaks";
+
+/* Stats screen */
+"stats_chart_weekly_trend" = "Weekly trend";
+"stats_chart_axis_day" = "Day";
+"stats_chart_axis_count" = "Count";
+"stats_financial_title" = "Financial overview";
+"stats_financial_subtitle" = "Based on last 30 days";
+"stats_financial_limit_label" = "Monthly limit";
+"stats_financial_spent_title" = "Spent this month";
+"stats_financial_saved_title" = "Saved this month";
+"stats_financial_set_limit_hint" = "Set your limit to compare";
+"stats_financial_spent_percent" = "%d%% of monthly limit";
+"stats_financial_savings_positive" = "Kept below your limit";
+"stats_financial_savings_negative" = "Track consistently to unlock savings";
+"stats_metrics_title" = "Daily insights";
+"stats_metrics_average_title" = "Average / day";
+"stats_metrics_average_caption" = "Last 7 days";
+"stats_metrics_goal_caption" = "Goal per day";
+"stats_metrics_level_caption" = "Progress tier";
+"stats_metrics_xp_caption" = "Lifetime experience";
+"stats_metrics_coins_caption" = "Spend on rewards";
+"stats_streak_current_label" = "Current";
+"stats_streak_best_label" = "Best";
 "Profile" = "Profile";
 "Display name" = "Display name";
 "Tracking" = "Tracking";

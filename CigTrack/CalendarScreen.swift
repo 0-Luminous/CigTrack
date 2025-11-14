@@ -8,6 +8,8 @@ struct CalendarScreen: View {
 
     @State private var monthAnchor: Date = Calendar.current.startOfMonth(for: Date())
     @State private var selectedDay: DaySelection?
+    @State private var isYearPickerPresented = false
+    @State private var pendingYearSelection: Int = Calendar.current.component(.year, from: Date())
 
     private var entryType: EntryType { user.product.entryType }
     private var limit: Int { Int(user.dailyLimit) }
@@ -25,9 +27,6 @@ struct CalendarScreen: View {
 
             ScrollView {
                 VStack(spacing: 16) {
-                    yearHeader
-                        .padding(.horizontal)
-
                     MonthSlider(months: monthsOfYear,
                                 selection: $monthAnchor,
                                 selectedColor: primaryTextColor,
@@ -72,47 +71,62 @@ struct CalendarScreen: View {
             }
         }
         .navigationTitle("")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    pendingYearSelection = currentYear
+                    isYearPickerPresented = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(yearTitle)
+                            .font(.headline)
+                        Image(systemName: "chevron.down")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.12), in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .tint(primaryTextColor)
+            }
+        }
         .animation(.spring(response: 0.35, dampingFraction: 0.9), value: monthAnchor)
         .sheet(item: $selectedDay) { selection in
             DailyDetailSheet(user: user, date: selection.date, entryType: entryType)
+                .presentationBackground(.ultraThinMaterial)
+                .presentationCornerRadius(36)
         }
-    }
-
-    private var yearHeader: some View {
-        HStack {
-            Button {
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
-                    shiftYear(-1)
+        .sheet(isPresented: $isYearPickerPresented) {
+            NavigationStack {
+                VStack {
+                    Picker("Year", selection: $pendingYearSelection) {
+                        ForEach(yearOptions, id: \.self) { year in
+                            Text("\(year)")
+                                .tag(year)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .labelsHidden()
+                    .frame(maxWidth: .infinity)
                 }
-            } label: {
-                Image(systemName: "chevron.left")
-                    .padding(20)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(primaryTextColor)
-            }
-            .glassEffect(.clear)
-            .accessibilityLabel("Previous year")
-
-            Spacer()
-
-            Text(yearTitle)
-                .font(.largeTitle.bold())
-                .foregroundStyle(primaryTextColor)
-
-            Spacer()
-
-            Button {
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
-                    shiftYear(1)
+                .padding()
+                .navigationTitle(Text("Select Year"))
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            isYearPickerPresented = false
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            applySelectedYear()
+                        }
+                    }
                 }
-            } label: {
-                Image(systemName: "chevron.right")
-                    .padding(20)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(primaryTextColor)
             }
-            .glassEffect(.clear)
-            .accessibilityLabel("Next year")
+            .presentationDetents([.fraction(0.35)])
         }
     }
 
@@ -141,9 +155,34 @@ struct CalendarScreen: View {
         return Array(repeating: nil, count: leading) + monthDays.map { Optional.some($0) } + Array(repeating: nil, count: trailing)
     }
 
-    private func shiftYear(_ delta: Int) {
-        guard let next = Calendar.current.date(byAdding: .year, value: delta, to: monthAnchor) else { return }
-        monthAnchor = Calendar.current.startOfMonth(for: next)
+    private var currentYear: Int {
+        Calendar.current.component(.year, from: monthAnchor)
+    }
+
+    private var yearOptions: [Int] {
+        let calendar = Calendar.current
+        let creationYear = calendar.component(.year, from: user.createdAt ?? Date())
+        let currentYear = calendar.component(.year, from: Date())
+        let anchorYear = calendar.component(.year, from: monthAnchor)
+        let start = [creationYear, currentYear, anchorYear].min() ?? currentYear
+        let endBaseline = [creationYear, anchorYear].max() ?? currentYear
+        let end = max(currentYear + 1, endBaseline)
+        return Array(start...end)
+    }
+
+    private func applySelectedYear() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+            updateYear(to: pendingYearSelection)
+        }
+        isYearPickerPresented = false
+    }
+
+    private func updateYear(to year: Int) {
+        var components = Calendar.current.dateComponents([.month], from: monthAnchor)
+        components.year = year
+        components.day = 1
+        guard let date = Calendar.current.date(from: components) else { return }
+        monthAnchor = Calendar.current.startOfMonth(for: date)
     }
 
     private func count(for date: Date) -> Int {
@@ -395,13 +434,16 @@ private struct DailyDetailSheet: View {
     @ObservedObject var user: User
     let date: Date
     let entryType: EntryType
+    private let methodLabel: String?
 
     @FetchRequest private var entries: FetchedResults<Entry>
+    @AppStorage("dashboardBackgroundIndex") private var backgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
 
     init(user: User, date: Date, entryType: EntryType) {
         self.user = user
         self.date = date
         self.entryType = entryType
+        self.methodLabel = DailyDetailSheet.resolveMethodLabel()
 
         let calendar = Calendar.current
         let start = calendar.startOfDay(for: date) as NSDate
@@ -416,20 +458,29 @@ private struct DailyDetailSheet: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section(header: Text(formattedDate)) {
-                    ForEach(entries) { entry in
-                        VStack(alignment: .leading) {
-                            Text(timeString(for: entry.createdAt ?? Date()))
-                                .font(.headline)
-                            if entry.cost > 0 {
-                                Text(String(format: "%.2f", entry.cost))
+            ZStack {
+                backgroundGradient
+                    .ignoresSafeArea()
+
+                List {
+                    Section(header: Text(formattedDate)
+                        .foregroundStyle(backgroundStyle.primaryTextColor)) {
+                        ForEach(entries) { entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(timeString(for: entry.createdAt ?? Date()))
+                                    .font(.headline)
+                                    .foregroundStyle(backgroundStyle.primaryTextColor)
+                                Text(consumptionDescription(for: entry))
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(backgroundStyle.secondaryTextColor)
                             }
+                            .padding(.vertical, 6)
+                            .listRowBackground(Color.clear)
                         }
                     }
+                    .listRowBackground(Color.clear)
                 }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Day details")
             .toolbar {
@@ -437,8 +488,6 @@ private struct DailyDetailSheet: View {
                     Button("Close", action: dismiss.callAsFunction)
                 }
             }
-            .scrollContentBackground(.hidden)
-            .listRowBackground(Color.clear)
         }
     }
 
@@ -452,6 +501,37 @@ private struct DailyDetailSheet: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+
+    private func consumptionDescription(for entry: Entry) -> String {
+        if let methodLabel {
+            return methodLabel
+        }
+
+        guard let type = EntryType(rawValue: entry.type) else {
+            return user.product.title
+        }
+
+        switch type {
+        case .cig:
+            return NSLocalizedString("Cigarettes", comment: "entry detail label")
+        case .puff:
+            return NSLocalizedString("Vape", comment: "entry detail label")
+        }
+    }
+
+    private static func resolveMethodLabel() -> String? {
+        let store = InMemorySettingsStore()
+        guard let method = store.loadProfile()?.method else { return nil }
+        return NSLocalizedString(method.localizationKey, comment: "nicotine method label")
+    }
+
+    private var backgroundStyle: DashboardBackgroundStyle {
+        DashboardBackgroundStyle(rawValue: backgroundIndex) ?? .default
+    }
+
+    private var backgroundGradient: LinearGradient {
+        backgroundStyle.backgroundGradient
     }
 }
 

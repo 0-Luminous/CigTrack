@@ -14,6 +14,8 @@ struct MainDashboardView: View {
     @State private var showSettings = false
     @State private var now = Date()
     @State private var weekEntryCounts: [Date: Int] = [:]
+    @State private var lastEntryDate: Date?
+    @State private var bestAbstinenceInterval: TimeInterval = 0
 
     // Hold-to-log interaction state
     @State private var isHolding = false
@@ -26,6 +28,9 @@ struct MainDashboardView: View {
     @State private var breathingTask: Task<Void, Never>?
     @State private var holdHapticCancellable: AnyCancellable?
     @State private var holdHapticGenerator = UIImpactFeedbackGenerator(style: .heavy)
+    @State private var pendingDecrementTap = false
+    @State private var isCurrentHoldDecrement = false
+    @State private var pendingDecrementResetWorkItem: DispatchWorkItem?
 
     private var entryType: EntryType { user.product.entryType }
     private var dailyLimit: Int { max(Int(user.dailyLimit), 0) }
@@ -33,9 +38,10 @@ struct MainDashboardView: View {
         DashboardBackgroundStyle(rawValue: backgroundIndex) ?? .default
     }
 
-    private let clock = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    private let clock = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private let holdDuration: TimeInterval = 1.1
     private let holdTick: TimeInterval = 0.02
+    private let decrementIntentWindow: TimeInterval = 1.0
 
     private static let nextTimeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -51,14 +57,23 @@ struct MainDashboardView: View {
         return formatter
     }()
 
+    private static let abstinenceFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.day, .hour, .minute]
+        formatter.unitsStyle = .abbreviated
+        formatter.maximumUnitCount = 3
+        formatter.zeroFormattingBehavior = [.dropAll]
+        return formatter
+    }()
+
     var body: some View {
         NavigationStack {
             ZStack {
                 backgroundGradient
                     .ignoresSafeArea()
 
-                VStack(spacing: 32) {
-                    Spacer(minLength: 40)
+                VStack(spacing: 28) {
+                    abstinenceStatsCard
 
                     holdButton
 
@@ -68,7 +83,7 @@ struct MainDashboardView: View {
                             .tracking(1.2)
                             .foregroundStyle(backgroundStyle.primaryTextColor)
 
-                        Text("🚬 \(nextEntryLabel)".uppercased())
+                        Text("\(nextEntryLabel)".uppercased())
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(backgroundStyle.secondaryTextColor)
                     }
@@ -77,6 +92,7 @@ struct MainDashboardView: View {
 
                 }
                 .padding(.horizontal, 24)
+                .padding(.top, 32)
                 .padding(.bottom, 32)
             }
             .sheet(isPresented: $showSettings) {
@@ -92,6 +108,8 @@ struct MainDashboardView: View {
                 breathingTask?.cancel()
                 breathingTask = nil
                 stopHoldHaptics()
+                discardPendingDecrementIntent()
+                isCurrentHoldDecrement = false
             }
             .onReceive(clock) { time in
                 let previousDay = Calendar.current.startOfDay(for: now)
@@ -117,11 +135,11 @@ struct MainDashboardView: View {
                         Label("Stats", systemImage: "chart.bar.xaxis")
                     }
 
-                    NavigationLink {
-                        AchievementsScreen(user: user)
-                    } label: {
-                        Label("Achievements", systemImage: "medal")
-                    }
+//                    NavigationLink {
+//                        AchievementsScreen(user: user)
+//                    } label: {
+//                        Label("Achievements", systemImage: "medal")
+//                    }
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -146,7 +164,7 @@ private extension MainDashboardView {
                 .fill(holdOverlayColor)
                 .scaleEffect(max(holdProgress, 0.001))
                 .opacity(holdProgress > 0 ? 0.9 : 0)
-                .blendMode(.plusLighter)
+                .blendMode(isDecrementHoldIntent ? .normal : .plusLighter)
 
             Circle()
                 .glassEffect()
@@ -169,7 +187,62 @@ private extension MainDashboardView {
         }, perform: {
             completeHold()
         })
+        .simultaneousGesture(
+            TapGesture()
+                .onEnded {
+                    registerDecrementIntent()
+                }
+        )
         .sensoryFeedback(.impact(weight: .heavy, intensity: 0.95), trigger: hapticTrigger)
+    }
+
+    var abstinenceStatsCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            abstinenceStatBlock(title: NSLocalizedString("Time since last use", comment: "elapsed timer title"),
+                                value: abstinenceTimerValue,
+                                isActive: hasLoggedEntries)
+
+            Divider()
+                .background(statCardBorderColor.opacity(0.6))
+
+            abstinenceStatBlock(title: NSLocalizedString("Best nicotine-free streak", comment: "record timer title"),
+                                value: abstinenceRecordValue,
+                                isActive: bestRecordIsActive)
+
+            if !hasLoggedEntries {
+                Text(NSLocalizedString("Start logging to enable the timer", comment: "timer empty state hint"))
+                    .font(.footnote)
+                    .foregroundStyle(backgroundStyle.secondaryTextColor)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .fill(statCardBackgroundColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 26, style: .continuous)
+                        .stroke(statCardBorderColor, lineWidth: 1)
+                )
+        )
+        .shadow(color: statCardShadowColor, radius: 12, x: 0, y: 8)
+    }
+
+    func abstinenceStatBlock(title: String, value: String, isActive: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title.uppercased())
+                .font(.system(size: 11, weight: .semibold))
+                .tracking(1)
+                .foregroundStyle(backgroundStyle.secondaryTextColor)
+            Text(value)
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundStyle(isActive ? backgroundStyle.primaryTextColor : backgroundStyle.secondaryTextColor)
+                .monospacedDigit()
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -189,16 +262,49 @@ private extension MainDashboardView {
         backgroundStyle.circleGradient
     }
 
+    var statCardBackgroundColor: Color {
+        switch backgroundStyle {
+        case .sunrise, .amber:
+            return Color.white.opacity(0.55)
+        case .ocean, .forest, .midnight:
+            return Color.white.opacity(0.12)
+        }
+    }
+
+    var statCardBorderColor: Color {
+        switch backgroundStyle {
+        case .sunrise, .amber:
+            return Color.black.opacity(0.08)
+        case .ocean, .forest, .midnight:
+            return Color.white.opacity(0.28)
+        }
+    }
+
+    var statCardShadowColor: Color {
+        switch backgroundStyle {
+        case .sunrise, .amber:
+            return Color.black.opacity(0.15)
+        case .ocean, .forest, .midnight:
+            return Color.black.opacity(0.35)
+        }
+    }
+
+    var isDecrementHoldIntent: Bool {
+        isCurrentHoldDecrement || pendingDecrementTap
+    }
+
     var holdOverlayColor: Color {
-        .red
+        isDecrementHoldIntent ? .black : .white
     }
 
     var remainingLabel: String {
         let remaining = max(dailyLimit - todayCount, 0)
-        return String(format: NSLocalizedString("%@ LEFT TODAY: %d/%d", comment: "Remaining entries label"),
-                      entryTypeLabel,
-                      remaining,
-                      dailyLimit)
+        return String.localizedStringWithFormat(
+            NSLocalizedString("%1$@ LEFT TODAY: %2$d/%3$d", comment: "Remaining entries label"),
+            entryTypeLabel,
+            remaining,
+            dailyLimit
+        )
     }
 
     var nextEntryLabel: String {
@@ -215,7 +321,10 @@ private extension MainDashboardView {
         }
 
         let formatted = Self.nextTimeFormatter.string(from: nextSuggestedDate)
-        return String(format: NSLocalizedString("Next at: %@", comment: "Next entry time"), formatted)
+        return String.localizedStringWithFormat(
+            NSLocalizedString("Next at: %@", comment: "Next entry time"),
+            formatted
+        )
     }
 
     var entryTypeLabel: String {
@@ -261,6 +370,46 @@ private extension MainDashboardView {
                            count: count,
                            limit: dailyLimit)
         }
+    }
+}
+
+// MARK: - Abstinence Helpers
+
+private extension MainDashboardView {
+    var hasLoggedEntries: Bool {
+        lastEntryDate != nil || bestAbstinenceInterval > 0
+    }
+
+    var bestRecordIsActive: Bool {
+        bestAbstinenceInterval > 0 || (currentAbstinenceInterval ?? 0) > 0
+    }
+
+    var currentAbstinenceInterval: TimeInterval? {
+        guard let lastEntryDate else { return nil }
+        return max(now.timeIntervalSince(lastEntryDate), 0)
+    }
+
+    var abstinenceTimerValue: String {
+        guard let interval = currentAbstinenceInterval else {
+            return "--"
+        }
+        return formattedDuration(interval)
+    }
+
+    var abstinenceRecordValue: String {
+        let record = max(bestAbstinenceInterval, currentAbstinenceInterval ?? 0)
+        guard record > 0 else {
+            return NSLocalizedString("No record yet", comment: "record placeholder")
+        }
+        return formattedDuration(record)
+    }
+
+    func formattedDuration(_ interval: TimeInterval) -> String {
+        let safeInterval = max(interval, 1)
+        if safeInterval < 60 {
+            return NSLocalizedString("<1m", comment: "duration shorter than a minute")
+        }
+        return Self.abstinenceFormatter.string(from: safeInterval) ?? "--"
     }
 }
 
@@ -317,6 +466,12 @@ private extension MainDashboardView {
         holdCompleted = false
         isHolding = true
         holdProgress = 0
+        isCurrentHoldDecrement = pendingDecrementTap
+        if isCurrentHoldDecrement {
+            discardPendingDecrementIntent()
+        } else {
+            cancelDecrementIntentReset()
+        }
         startHoldHaptics()
 
         let step = holdTick / holdDuration
@@ -346,6 +501,7 @@ private extension MainDashboardView {
                 holdProgress = 0
             }
         }
+        isCurrentHoldDecrement = false
     }
 
     func completeHold() {
@@ -358,9 +514,7 @@ private extension MainDashboardView {
             holdProgress = 1
         }
 
-        if removeEntry() {
-            hapticTrigger += 1
-        }
+        performHoldAction()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
             withAnimation(.easeInOut(duration: 0.3)) {
@@ -390,6 +544,44 @@ private extension MainDashboardView {
         holdHapticCancellable?.cancel()
         holdHapticCancellable = nil
     }
+
+    func registerDecrementIntent() {
+        pendingDecrementTap = true
+        cancelDecrementIntentReset()
+        let workItem = DispatchWorkItem {
+            pendingDecrementTap = false
+            pendingDecrementResetWorkItem = nil
+        }
+        pendingDecrementResetWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + decrementIntentWindow, execute: workItem)
+    }
+
+    func discardPendingDecrementIntent() {
+        pendingDecrementTap = false
+        cancelDecrementIntentReset()
+    }
+
+    func cancelDecrementIntentReset() {
+        pendingDecrementResetWorkItem?.cancel()
+        pendingDecrementResetWorkItem = nil
+    }
+
+    func performHoldAction() {
+        let actionSucceeded: Bool
+        if isCurrentHoldDecrement {
+            actionSucceeded = removeEntry()
+        } else {
+            actionSucceeded = logEntry()
+        }
+        if actionSucceeded {
+            triggerHoldSuccessHaptic()
+        }
+        isCurrentHoldDecrement = false
+    }
+
+    func triggerHoldSuccessHaptic() {
+        hapticTrigger += 1
+    }
 }
 
 // MARK: - Actions
@@ -405,31 +597,29 @@ private extension MainDashboardView {
         return removed
     }
 
+    @discardableResult
+    func logEntry() -> Bool {
+        let tracker = TrackingService(context: context)
+        tracker.addEntry(for: user, type: entryType)
+        refreshToday(reference: Date())
+        return true
+    }
+
     func refreshToday(reference: Date) {
         let stats = StatsService(context: context)
         todayCount = stats.countForDay(user: user, date: reference, type: entryType)
         weekEntryCounts = fetchWeekCounts(stats: stats, anchor: reference)
-        nextSuggestedDate = calculateNextSuggestedDate()
+        let abstinenceStats = fetchAbstinenceStats(reference: reference)
+        lastEntryDate = abstinenceStats.lastEntry
+        bestAbstinenceInterval = abstinenceStats.longestInterval
+        nextSuggestedDate = calculateNextSuggestedDate(lastEntryDate: abstinenceStats.lastEntry)
     }
 
-    func calculateNextSuggestedDate() -> Date? {
+    func calculateNextSuggestedDate(lastEntryDate: Date?) -> Date? {
         guard dailyLimit > 0 else { return nil }
-
-        let request: NSFetchRequest<Entry> = Entry.fetchRequest()
-        request.fetchLimit = 1
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \Entry.createdAt, ascending: false)]
-        request.predicate = NSPredicate(format: "user == %@ AND type == %d",
-                                        user, entryType.rawValue)
-
-        guard
-            let lastEntry = try? context.fetch(request).first,
-            let createdAt = lastEntry.createdAt
-        else {
-            return nil
-        }
-
+        guard let lastEntryDate else { return nil }
         let interval = 24 * 60 * 60 / Double(max(dailyLimit, 1))
-        return createdAt.addingTimeInterval(interval)
+        return lastEntryDate.addingTimeInterval(interval)
     }
 
     func fetchWeekCounts(stats: StatsService, anchor: Date) -> [Date: Int] {
@@ -446,6 +636,40 @@ private extension MainDashboardView {
             result[calendar.startOfDay(for: date)] = count
         }
         return result
+    }
+
+    func fetchAbstinenceStats(reference: Date) -> AbstinenceStats {
+        let request: NSFetchRequest<Entry> = Entry.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Entry.createdAt, ascending: true)]
+        request.predicate = NSPredicate(format: "user == %@ AND type == %d",
+                                        user, entryType.rawValue)
+
+        guard let entries = try? context.fetch(request) else {
+            return AbstinenceStats(lastEntry: nil, longestInterval: 0)
+        }
+
+        let dates = entries.compactMap { $0.createdAt }.sorted()
+        guard !dates.isEmpty else {
+            return AbstinenceStats(lastEntry: nil, longestInterval: 0)
+        }
+
+        var longest: TimeInterval = 0
+        var previousDate = dates.first
+
+        for date in dates.dropFirst() {
+            if let previousDate {
+                let gap = max(date.timeIntervalSince(previousDate), 0)
+                longest = max(longest, gap)
+            }
+            previousDate = date
+        }
+
+        if let last = dates.last {
+            let gap = max(reference.timeIntervalSince(last), 0)
+            longest = max(longest, gap)
+        }
+
+        return AbstinenceStats(lastEntry: dates.last, longestInterval: max(longest, 0))
     }
 }
 
@@ -465,6 +689,11 @@ private struct WeekDay: Identifiable {
         guard limit > 0 else { return 0 }
         return Double(count) / Double(limit)
     }
+}
+
+private struct AbstinenceStats {
+    let lastEntry: Date?
+    let longestInterval: TimeInterval
 }
 
 #Preview {

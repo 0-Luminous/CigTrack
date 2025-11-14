@@ -1,3 +1,4 @@
+import Foundation
 import CoreData
 
 final class GamificationService {
@@ -144,24 +145,44 @@ final class GamificationService {
         return max(Int64(withinLimitDays), Int64(goodDays))
     }
 
-    func estimatedMoneySaved(user: User) -> Int64 {
-        // Estimate savings using user-provided pack cost when available.
-        let type = user.product.entryType
-        let stats = StatsService(context: context)
-        let totals = stats.totalsForLastDays(user: user, days: 30, type: type)
-        let average = totals.values.reduce(0, +) / max(1, totals.count)
+    func financialOverview(for user: User) -> FinancialOverview {
+        let entryType = user.product.entryType
+        let totals = stats.totalsForLastDays(user: user, days: 30, type: entryType)
+        let totalUnits = totals.values.reduce(0, +)
+        let samples = max(1, totals.count)
+        let averagePerDay = Double(totalUnits) / Double(samples)
 
-        let inferredCostPerUnit: Double
-        if type == .cig, user.packSize > 0, user.packCost > 0 {
-            inferredCostPerUnit = user.packCost / Double(user.packSize)
-        } else {
-            inferredCostPerUnit = type == .cig ? 15.0 : 8.0
+        let unitCost = inferredCostPerUnit(for: user, entryType: entryType)
+        let monthlyMultiplier = 30.0
+
+        let actualMonthly = max(0, averagePerDay * unitCost * monthlyMultiplier)
+        let baselineMonthly = max(0, Double(user.dailyLimit) * unitCost * monthlyMultiplier)
+        let savings = max(0, baselineMonthly - actualMonthly)
+
+        let currencyCode = user.currencyCode ?? Locale.current.currencyCode ?? "USD"
+
+        return FinancialOverview(currencyCode: currencyCode,
+                                 monthlySpend: actualMonthly,
+                                 monthlySavings: savings,
+                                 baselineMonthlyBudget: baselineMonthly)
+    }
+
+    func estimatedMoneySaved(user: User) -> Int64 {
+        let overview = financialOverview(for: user)
+        return Int64(overview.monthlySavings)
+    }
+
+    private func inferredCostPerUnit(for user: User, entryType: EntryType) -> Double {
+        if user.packSize > 0, user.packCost > 0 {
+            return user.packCost / Double(user.packSize)
         }
 
-        let baseline = Double(user.dailyLimit) * inferredCostPerUnit
-        let actual = Double(average) * inferredCostPerUnit
-        let saved = max(0, baseline - actual)
-        return Int64(saved * 30)
+        switch entryType {
+        case .cig:
+            return 15.0
+        case .puff:
+            return 8.0
+        }
     }
 
     private struct AchievementDefinition {
@@ -193,4 +214,20 @@ final class GamificationService {
                               threshold: 1000,
                               kind: .totalSaved)
     ]
+}
+
+struct FinancialOverview {
+    let currencyCode: String
+    let monthlySpend: Double
+    let monthlySavings: Double
+    let baselineMonthlyBudget: Double
+}
+
+extension FinancialOverview {
+    static var placeholder: FinancialOverview {
+        FinancialOverview(currencyCode: Locale.current.currencyCode ?? "USD",
+                          monthlySpend: 0,
+                          monthlySavings: 0,
+                          baselineMonthlyBudget: 0)
+    }
 }

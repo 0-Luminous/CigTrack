@@ -2,6 +2,17 @@
 "Cigarettes" = "Сигареты";
 "+ Puff" = "+ Затяжка";
 "+ Cigarette" = "+ Сигарета";
+"Time since last use" = "Время с последнего употребления";
+"Best nicotine-free streak" = "Рекорд без никотина";
+"Start logging to enable the timer" = "Начни вести учёт, чтобы запустить таймер.";
+"No record yet" = "Рекорд пока отсутствует";
+"<1m" = "<1 мин";
+"%1$@ LEFT TODAY: %2$d/%3$d" = "ОСТАЛОСЬ %1$@: %2$d/%3$d";
+"Next at: anytime" = "Следующая запись: в любое время";
+"Next at: now" = "Следующая запись: сейчас";
+"Next at: %@" = "Следующая запись: %@";
+"CIGARETTES" = "СИГАРЕТ";
+"PUFFS" = "ЗАТЯЖЕК";
 "Welcome to PuffQuest" = "Добро пожаловать в PuffQuest";
 "Choose your track" = "Выбери свой формат";
 "Set a daily limit" = "Установи дневной лимит";
@@ -36,6 +47,29 @@
 "XP" = "XP";
 "Coins" = "Монеты";
 "Streaks" = "Серии";
+
+/* Экран статистики */
+"stats_chart_weekly_trend" = "Недельная динамика";
+"stats_chart_axis_day" = "День";
+"stats_chart_axis_count" = "Количество";
+"stats_financial_title" = "Финансовый обзор";
+"stats_financial_subtitle" = "За последние 30 дней";
+"stats_financial_limit_label" = "Месячный лимит";
+"stats_financial_spent_title" = "Потрачено за месяц";
+"stats_financial_saved_title" = "Сэкономлено за месяц";
+"stats_financial_set_limit_hint" = "Укажи лимит для сравнения";
+"stats_financial_spent_percent" = "%d%% от месячного лимита";
+"stats_financial_savings_positive" = "Держишься ниже лимита";
+"stats_financial_savings_negative" = "Отмечай стабильно, чтобы увидеть экономию";
+"stats_metrics_title" = "Ежедневная аналитика";
+"stats_metrics_average_title" = "Среднее / день";
+"stats_metrics_average_caption" = "Последние 7 дней";
+"stats_metrics_goal_caption" = "Цель в день";
+"stats_metrics_level_caption" = "Уровень прогресса";
+"stats_metrics_xp_caption" = "Опыт за всё время";
+"stats_metrics_coins_caption" = "Трать на награды";
+"stats_streak_current_label" = "Текущая";
+"stats_streak_best_label" = "Лучшая";
 "Profile" = "Профиль";
 "Display name" = "Имя";
 "Tracking" = "Учёт";

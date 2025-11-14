@@ -1,5 +1,5 @@
-import SwiftUI
 import CoreData
+import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -86,12 +86,15 @@ struct SettingsView: View {
 }
 
 private extension SettingsView {
+    private var primaryTextColor: Color { backgroundStyle.primaryTextColor }
+    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor.opacity(0.9) }
+
     var trackingSection: some View {
         settingsCard(title: "Tracking") {
             VStack(alignment: .leading, spacing: 16) {
                 methodSelectionCard
 
-                Stepper(value: $dailyLimit, in: 1...60, step: 1) {
+                Stepper(value: $dailyLimit, in: 1 ... 60, step: 1) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Daily limit")
                             .font(.caption)
@@ -153,64 +156,71 @@ private extension SettingsView {
     }
 
     var modeSpotlight: some View {
-        let shape = RoundedRectangle(cornerRadius: 22, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: 26, style: .continuous)
 
         return Button {
             showModePicker = true
         } label: {
             ZStack(alignment: .bottomLeading) {
                 modeArtwork(for: selectedMode)
+                    .frame(maxWidth: .infinity)
                     .frame(height: 180)
-                    .clipShape(shape)
-                    .overlay(
-                        LinearGradient(colors: [
-                            Color.black.opacity(0.85),
-                            Color.black.opacity(0.45),
-                            Color.black.opacity(0.05)
-                        ], startPoint: .bottom, endPoint: .top)
-                            .clipShape(shape)
-                    )
 
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 8) {
-                        Image(systemName: modeSymbol(for: selectedMode))
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.white.opacity(0.85))
-                        Text("Active focus")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.white.opacity(0.85))
-                            .textCase(.uppercase)
-                            .tracking(1)
-                    }
-
-                    Text(selectedMode.titleKey)
-                        .font(.title3.weight(.bold))
-                        .foregroundStyle(.white)
-
-                    Text(selectedMode.subtitleKey)
-                        .font(.callout)
-                        .foregroundStyle(.white.opacity(0.9))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    HStack(spacing: 8) {
-                        ForEach(modeHighlights(for: selectedMode), id: \.self) { highlight in
-                            Text(highlight)
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 4)
-                                .background(Color.white.opacity(0.12), in: Capsule())
+                LinearGradient(colors: [
+                    Color.black.opacity(0.85),
+                    Color.black.opacity(0.45),
+                    Color.black.opacity(0.05),
+                ], startPoint: .bottom, endPoint: .top)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .allowsHitTesting(false)
+                HStack {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 8) {
+                            Image(systemName: modeSymbol(for: selectedMode))
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.white.opacity(0.85))
+                            Text("Active focus")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.white.opacity(0.85))
+                                .textCase(.uppercase)
+                                .tracking(1)
                         }
-                    }
+
+                        Text(selectedMode.titleKey)
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(.white)
+
+                        Text(selectedMode.subtitleKey)
+                            .font(.callout)
+                            .foregroundStyle(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        HStack(spacing: 8) {
+                            ForEach(modeHighlights(for: selectedMode), id: \.self) { highlight in
+                                Text(highlight)
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(Color.white.opacity(0.12), in: Capsule())
+                            }
+                        }
+                    } 
+                    Spacer()
+                    Image(systemName: "arrow.right.circle.fill")
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(primaryTextColor, primaryTextColor.opacity(0.6))
                 }
+                .padding(20)
             }
-            .padding(18)
+            .frame(maxWidth: .infinity)
             .frame(height: 180)
             .clipShape(shape)
             .overlay(
                 shape
                     .strokeBorder(modeSpotlightStrokeColor, lineWidth: 1.8)
             )
+//            .shadow(color: modeSpotlightShadowColor, radius: 22, x: 0, y: 14)
         }
         .buttonStyle(.plain)
     }
@@ -218,7 +228,8 @@ private extension SettingsView {
     var modePickerScreen: some View {
         ZStack(alignment: .topTrailing) {
             OnboardingWelcomeView(appName: "SmokeTracker",
-                                  selectedMode: $selectedMode) {
+                                  selectedMode: $selectedMode)
+            {
                 showModePicker = false
             }
             .preferredColorScheme(.dark)
@@ -297,7 +308,8 @@ private extension SettingsView {
 
     @ViewBuilder
     func settingsCard<Content: View>(title: LocalizedStringKey,
-                                     @ViewBuilder content: () -> Content) -> some View {
+                                     @ViewBuilder content: () -> Content) -> some View
+    {
         VStack(alignment: .leading, spacing: 16) {
             Text(title)
                 .font(.headline)

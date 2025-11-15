@@ -50,26 +50,25 @@ struct SettingsView: View {
                     .padding(.vertical, 24)
                     .padding(.bottom, 40)
                 }
-            }
-            .navigationTitle("Settings")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close", action: dismiss.callAsFunction)
+        }
+        .navigationTitle("Settings")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Close", action: dismiss.callAsFunction)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", action: save)
                 }
+        }
+        .onAppear(perform: synchronizeForm)
+        .fullScreenCover(isPresented: $showMethodPicker) {
+            SettingsMethodPickerView(selectedMethod: selectedMethod) { method in
+                selectedMethod = method
             }
-            .onAppear(perform: synchronizeForm)
-            .fullScreenCover(isPresented: $showMethodPicker) {
-                OnboardingMethodPickerView(selectedMethod: selectedMethod) { method in
-                    selectedMethod = method
-                    showMethodPicker = false
-                }
-            }
-            .fullScreenCover(isPresented: $showModePicker) {
-                modePickerScreen
-            }
+        }
+        .fullScreenCover(isPresented: $showModePicker) {
+            modePickerScreen
+        }
             .sheet(isPresented: $showAppearancePicker) {
                 appearancePickerSheet
             }

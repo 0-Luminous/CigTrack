@@ -9,29 +9,22 @@ struct ModeSpotlightCardView: View {
 
     var body: some View {
         Button(action: action) {
-            ZStack(alignment: .bottomLeading) {
-                ModeSpotlightBackgroundView(style: mode.spotlightBackground)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 200)
-                    .clipped()
+            VStack(alignment: .leading, spacing: 14) {
+                focusHeader
 
-                overlayLayer
+                Text(mode.subtitleKey)
+                    .font(.callout)
+                    .foregroundStyle(.white.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
 
-                VStack(alignment: .leading, spacing: 14) {
-                    focusHeader
-
-                    Text(mode.subtitleKey)
-                        .font(.callout)
-                        .foregroundStyle(.white.opacity(0.9))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    highlightRow
-                }
-                .padding(24)
-
-                arrowIndicator
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+                highlightRow
             }
+            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .trailing) {
+                arrowIndicator
+            }
+            .background(backgroundLayer)
             .clipShape(shape)
             .overlay(shape.strokeBorder(Color.white.opacity(0.22), lineWidth: 1))
             .overlay(
@@ -114,6 +107,11 @@ struct ModeSpotlightCardView: View {
             Color.black.opacity(0.15)
         ], startPoint: .bottom, endPoint: .top)
             .allowsHitTesting(false)
+    }
+
+    private var backgroundLayer: some View {
+        ModeSpotlightBackgroundView(style: mode.spotlightBackground)
+            .overlay(overlayLayer)
     }
 
     private var arrowIndicator: some View {

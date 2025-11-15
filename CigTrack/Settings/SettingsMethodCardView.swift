@@ -63,12 +63,12 @@ struct SettingsMethodCardView: View {
                     .foregroundStyle(secondaryTextColor)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Image(systemName: "arrow.right.circle.fill")
-                .symbolRenderingMode(.palette)
-                .foregroundStyle(primaryTextColor, primaryTextColor.opacity(0.6))
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .trailing) {
+            arrowIndicator
+        }
         .background(
             ZStack {
                 cardShape
@@ -104,5 +104,18 @@ struct SettingsMethodCardView: View {
                     .stroke(iconStrokeColor, lineWidth: 1)
             )
             .shadow(color: cardShadowColor.opacity(isLightBackground ? 0.7 : 0.5), radius: 16, y: 10)
+    }
+
+    private var arrowIndicator: some View {
+        Circle()
+            .glassEffect(.clear)
+            .frame(width: 46, height: 46)
+            .overlay(
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(primaryTextColor)
+            )
+            .padding(18)
+            .allowsHitTesting(false)
     }
 }

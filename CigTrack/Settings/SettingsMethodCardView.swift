@@ -19,13 +19,13 @@ struct SettingsMethodCardView: View {
         }
     }
 
-    private var cardFillColor: Color {
-        isLightBackground ? Color.white.opacity(0.65) : Color.white.opacity(0.12)
-    }
+    // private var cardFillColor: Color {
+    //     isLightBackground ? Color.white.opacity(0.65) : Color.white.opacity(0.12)
+    // }
 
-    private var cardShadowColor: Color {
-        isLightBackground ? Color.black.opacity(0.15) : Color.black.opacity(0.4)
-    }
+    // private var cardShadowColor: Color {
+    //     isLightBackground ? Color.black.opacity(0.15) : Color.black.opacity(0.4)
+    // }
 
     private var iconStrokeColor: Color {
         isLightBackground ? Color.black.opacity(0.05) : Color.white.opacity(0.2)
@@ -69,22 +69,12 @@ struct SettingsMethodCardView: View {
         .overlay(alignment: .trailing) {
             arrowIndicator
         }
-        .background(
-            ZStack {
-                cardShape
-                    .fill(backgroundStyle.backgroundGradient)
-                    .opacity(0.45)
-
-                cardShape
-                    .fill(cardFillColor)
-            }
-        )
-        .overlay(
-            cardShape
-                .strokeBorder(primaryTextColor.opacity(0.8), lineWidth: 1.8)
-        )
-        .shadow(color: cardShadowColor, radius: 22, x: 0, y: 14)
+        // .shadow(color: cardShadowColor, radius: 22, x: 0, y: 14)
         .accessibilityElement(children: .combine)
+        .glassEffect(
+            .clear.interactive(),
+            in: .rect(cornerRadius: 24)
+            )
     }
 
     private var methodIcon: some View {
@@ -103,7 +93,7 @@ struct SettingsMethodCardView: View {
                 iconShape
                     .stroke(iconStrokeColor, lineWidth: 1)
             )
-            .shadow(color: cardShadowColor.opacity(isLightBackground ? 0.7 : 0.5), radius: 16, y: 10)
+            // .shadow(color: cardShadowColor.opacity(isLightBackground ? 0.7 : 0.5), radius: 16, y: 10)
     }
 
     private var arrowIndicator: some View {

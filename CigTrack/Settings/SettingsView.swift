@@ -145,20 +145,16 @@ private extension SettingsView {
             Button {
                 showAppearancePicker = true
             } label: {
-                HStack(spacing: 12) {
+                HStack(spacing: 16) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(backgroundStyle.previewGradient)
-                            .frame(width: 56, height: 56)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                            )
-                            .shadow(color: .black.opacity(0.25), radius: 10, y: 6)
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                             .frame(width: 64, height: 64)
+                             .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
 
                         Image(systemName: "paintpalette.fill")
-                            .font(.title3)
+                            .font(.title2.weight(.semibold))
                             .foregroundStyle(.white)
+                            .shadow(color: .white.opacity(0.5), radius: 12)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -168,15 +164,23 @@ private extension SettingsView {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-
-                    Spacer()
-
-                    Image(systemName: "chevron.right")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
+            
                 }
-                .padding(.vertical, 8)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 14)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 24))
+            }
+            .overlay(alignment: .trailing) {
+                Circle()
+                        .glassEffect(.clear)           
+                        .frame(width: 46, height: 46)
+                        .overlay(
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(Color.white)
+                        )
+                        .padding(18)
             }
             .buttonStyle(.plain)
         }

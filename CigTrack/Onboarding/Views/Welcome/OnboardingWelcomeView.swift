@@ -166,24 +166,35 @@ private struct ModeSlide: View {
                         .padding(.horizontal, 25)
                         .padding(.bottom, 14)
                 }
-                .glassEffect(.clear)
+                .glassEffect(
+                    .clear,
+                    in: .rect(cornerRadius: 24)
+                    )
 
                 VStack(alignment: .leading, spacing: 10) {
                     ModeIndicator(selectedMode: selectedMode)
-                    HStack{
+                    HStack {
                         Spacer()
                         Text("onboarding_mode_swipe_hint")
-                        .multilineTextAlignment(.center)
-                        .font(.footnote)
-                        .foregroundStyle(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                            .font(.footnote)
+                            .foregroundStyle(.white.opacity(0.7))
                         Spacer()
                     }
                 }
-
                 Button(action: onStart) {
                     Text("onboarding_primary_cta")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .padding(.vertical, 16)
+                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(PrimaryGradientButtonStyle())
+                .contentShape(Capsule())
+                .background(
+                    Capsule()
+                        .fill(Color.blue)
+                )
+                .shadow(color: Color.blue.opacity(0.3), radius: 18, x: 0, y: 10)
                 .accessibilityHint(Text("onboarding_primary_cta_hint"))
             }
             .frame(maxWidth: 520, alignment: .leading)

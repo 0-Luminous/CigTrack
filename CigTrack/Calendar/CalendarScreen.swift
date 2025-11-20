@@ -20,7 +20,9 @@ struct CalendarScreen: View {
     private var backgroundStyle: DashboardBackgroundStyle {
         style(for: colorScheme)
     }
-    private var backgroundGradient: LinearGradient { backgroundStyle.backgroundGradient }
+    private var backgroundGradient: LinearGradient {
+        backgroundStyle.backgroundGradient(for: colorScheme)
+    }
     private var primaryTextColor: Color { backgroundStyle.primaryTextColor }
     private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor }
     private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
@@ -553,7 +555,7 @@ private struct DailyDetailSheet: View {
     }
 
     private var backgroundGradient: LinearGradient {
-        backgroundStyle.backgroundGradient
+        backgroundStyle.backgroundGradient(for: colorScheme)
     }
 
     private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {

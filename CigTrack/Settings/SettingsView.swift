@@ -18,7 +18,8 @@ struct SettingsView: View {
     @State private var showModePicker = false
     @State private var showAppearancePicker = false
     @State private var selectedMode: OnboardingMode = .tracking
-    @State private var appearancePickerMode: ColorScheme = .light
+    @State private var appearancePickerMode: ColorScheme? = nil
+    @AppStorage("appPreferredColorScheme") private var appPreferredColorSchemeRaw: Int = 0
 
     private var backgroundStyle: DashboardBackgroundStyle {
         style(for: colorScheme)
@@ -36,7 +37,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                backgroundStyle.backgroundGradient
+                backgroundStyle.backgroundGradient(for: colorScheme)
                     .ignoresSafeArea()
 
                 ScrollView {
@@ -50,17 +51,21 @@ struct SettingsView: View {
                     .padding(.vertical, 24)
                     .padding(.bottom, 40)
                 }
-        }
-        .navigationTitle("Settings")
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Close", action: dismiss.callAsFunction)
+            }
+            .navigationTitle("Settings")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close", action: dismiss.callAsFunction)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", action: save)
                 }
+            }
         }
-        .onAppear(perform: synchronizeForm)
+        .onAppear {
+            synchronizeForm()
+            ensureAppearanceMigration()
+        }
         .fullScreenCover(isPresented: $showMethodPicker) {
             SettingsMethodPickerView(selectedMethod: selectedMethod) { method in
                 selectedMethod = method
@@ -69,9 +74,14 @@ struct SettingsView: View {
         .fullScreenCover(isPresented: $showModePicker) {
             modePickerScreen
         }
-            .sheet(isPresented: $showAppearancePicker) {
-                appearancePickerSheet
-            }
+        .sheet(isPresented: $showAppearancePicker) {
+            SettingsAppearancePickerSheet(
+                appearancePickerMode: $appearancePickerMode,
+                showAppearancePicker: $showAppearancePicker,
+                backgroundIndexLight: $backgroundIndexLight,
+                backgroundIndexDark: $backgroundIndexDark,
+                appPreferredColorSchemeRaw: $appPreferredColorSchemeRaw
+            )
         }
     }
 
@@ -91,12 +101,6 @@ struct SettingsView: View {
 
 private extension SettingsView {
     private var primaryTextColor: Color { backgroundStyle.primaryTextColor }
-    private var appearancePickerDescription: String {
-        appearancePickerMode == .dark
-            ? NSLocalizedString("Shown when the app is in Dark Mode.", comment: "Dark appearance description")
-            : NSLocalizedString("Shown when the app is in Light Mode.", comment: "Light appearance description")
-    }
-
     private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
         ensureAppearanceMigration()
         let index = backgroundIndex(for: scheme)
@@ -261,91 +265,6 @@ private extension SettingsView {
         .buttonStyle(.plain)
     }
 
-    var appearancePickerSheet: some View {
-        ensureAppearanceMigration()
-        return NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Picker("Theme", selection: $appearancePickerMode) {
-                            Text("Light").tag(ColorScheme.light)
-                            Text("Dark").tag(ColorScheme.dark)
-                        }
-                        .pickerStyle(.segmented)
-
-                        Text(appearancePickerDescription)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 3),
-                              spacing: 16) {
-                        ForEach(DashboardBackgroundStyle.appearanceOptions) { style in
-                            let isSelected = backgroundIndex(for: appearancePickerMode) == style.rawValue
-                            Button {
-                                updateBackgroundIndex(style.rawValue, for: appearancePickerMode)
-                            } label: {
-                                VStack(spacing: 10) {
-                                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                        .fill(style.previewGradient)
-                                        .frame(height: 80)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                                .stroke(isSelected ? Color.white : Color.white.opacity(0.4),
-                                                        lineWidth: isSelected ? 3 : 1)
-                                        )
-                                        .overlay(alignment: .topTrailing) {
-                                            if isSelected {
-                                                Image(systemName: "checkmark.circle.fill")
-                                                    .foregroundStyle(.white)
-                                                    .shadow(radius: 6)
-                                                    .offset(x: -8, y: 8)
-                                            }
-                                        }
-
-                                    Text(style.name)
-                                        .font(.footnote.weight(isSelected ? .semibold : .regular))
-                                        .foregroundStyle(isSelected ? .primary : .secondary)
-                                        .lineLimit(1)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(12)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                                        .fill(.thinMaterial)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                                        .stroke(Color.white.opacity(isSelected ? 0.7 : 0.25), lineWidth: 1)
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 40)
-                }
-            }
-            .background(Color(.systemBackground))
-            .navigationTitle("Appearance")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { showAppearancePicker = false }
-                }
-                ToolbarItem(placement: .principal) {
-                    Text("Choose Appearance")
-                        .font(.headline)
-                }
-            }
-        }
-        .presentationDetents([.large])
-        .onAppear {
-            appearancePickerMode = colorScheme
-        }
-    }
-
     @ViewBuilder
     func settingsCard<Content: View>(title: LocalizedStringKey,
                                      @ViewBuilder content: () -> Content) -> some View {
@@ -380,6 +299,7 @@ private extension SettingsView {
             return .vape
         }
     }
+
 }
 
 #Preview {

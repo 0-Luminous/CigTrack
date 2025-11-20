@@ -171,7 +171,9 @@ private extension MainDashboardView {
                 .blendMode(isDecrementHoldIntent ? .normal : .plusLighter)
 
             Circle()
-                .glassEffect()
+                .glassEffect(
+                    .clear.interactive()
+                )
                 
             Text("\(todayCount)")
                 .font(.system(size: 120, weight: .bold, design: .rounded))
@@ -222,13 +224,9 @@ private extension MainDashboardView {
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .fill(statCardBackgroundColor)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 26, style: .continuous)
-                        .stroke(statCardBorderColor, lineWidth: 1)
-                )
+        .glassEffect(
+            .clear,
+            in: .rect(cornerRadius: 24)
         )
         .shadow(color: statCardShadowColor, radius: 12, x: 0, y: 8)
     }
@@ -272,7 +270,7 @@ private extension MainDashboardView {
     }
 
     var backgroundGradient: LinearGradient {
-        backgroundStyle.backgroundGradient
+        backgroundStyle.backgroundGradient(for: colorScheme)
     }
 
     var circleGradient: RadialGradient {

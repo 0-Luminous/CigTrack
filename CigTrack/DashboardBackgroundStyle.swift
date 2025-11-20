@@ -5,7 +5,6 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
     case amber
     case ocean
     case forest
-    case midnight
     case sunsetAura
     case oceanDeep
     case cosmicPurple
@@ -17,10 +16,9 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
     case forestEmerald
     case skyMorning
     case pinkNebula
-    case electricNight
 
-    static let `default`: DashboardBackgroundStyle = .sunrise
-    static let defaultDark: DashboardBackgroundStyle = .midnight
+    static let `default`: DashboardBackgroundStyle = .iceCrystal
+    static let defaultDark: DashboardBackgroundStyle = .iceCrystal
     static func `default`(for scheme: ColorScheme) -> DashboardBackgroundStyle {
         scheme == .dark ? defaultDark : `default`
     }
@@ -32,8 +30,6 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
         .lavaBurst,
         .pinkNebula,
         .cosmicPurple,
-        .midnight,
-        .electricNight,
         .oceanDeep,
         .ocean,
         .skyMorning,
@@ -68,18 +64,26 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
         case .forestEmerald: return NSLocalizedString("Forest Emerald", comment: "Dashboard background option")
         
         case .pinkNebula: return NSLocalizedString("Pink Nebula", comment: "Dashboard background option")
-        case .electricNight: return NSLocalizedString("Electric Night", comment: "Dashboard background option")
         case .cosmicPurple: return NSLocalizedString("Cosmic Purple", comment: "Dashboard background option")
-        case .midnight: return NSLocalizedString("Midnight", comment: "Dashboard background option")
         }
     }
 
     var previewGradient: LinearGradient {
-        LinearGradient(colors: backgroundColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+        previewGradient(for: .light)
+    }
+
+    func previewGradient(for scheme: ColorScheme) -> LinearGradient {
+        LinearGradient(colors: gradientColors(for: scheme),
+                       startPoint: .topLeading,
+                       endPoint: .bottomTrailing)
     }
 
     var backgroundGradient: LinearGradient {
-        LinearGradient(colors: backgroundColors, startPoint: .top, endPoint: .bottom)
+        backgroundGradient(for: .light)
+    }
+
+    func backgroundGradient(for scheme: ColorScheme) -> LinearGradient {
+        LinearGradient(colors: gradientColors(for: scheme), startPoint: .top, endPoint: .bottom)
     }
 
     var circleGradient: RadialGradient {
@@ -90,7 +94,7 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
         switch self {
         case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
             return Color.black.opacity(0.88)
-        case .ocean, .forest, .midnight, .oceanDeep, .cosmicPurple, .lavaBurst, .forestEmerald, .pinkNebula, .electricNight:
+        case .ocean, .forest, .oceanDeep, .cosmicPurple, .lavaBurst, .forestEmerald, .pinkNebula:
             return Color.white.opacity(0.95)
         }
     }
@@ -99,7 +103,7 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
         switch self {
         case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
             return Color.black.opacity(0.7)
-        case .ocean, .forest, .midnight, .oceanDeep, .cosmicPurple, .lavaBurst, .forestEmerald, .pinkNebula, .electricNight:
+        case .ocean, .forest, .oceanDeep, .cosmicPurple, .lavaBurst, .forestEmerald, .pinkNebula:
             return Color.white.opacity(0.78)
         }
     }
@@ -108,9 +112,13 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
         switch self {
         case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
             return Color.black.opacity(0.85)
-        case .ocean, .forest, .midnight, .oceanDeep, .cosmicPurple, .lavaBurst, .forestEmerald, .pinkNebula, .electricNight:
+        case .ocean, .forest, .oceanDeep, .cosmicPurple, .lavaBurst, .forestEmerald, .pinkNebula:
             return Color.white.opacity(0.95)
         }
+    }
+
+    private func gradientColors(for scheme: ColorScheme) -> [Color] {
+        scheme == .dark ? darkBackgroundColors : backgroundColors
     }
 
     private var backgroundColors: [Color] {
@@ -134,11 +142,6 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
             return [
                 Color(red: 0.33, green: 0.71, blue: 0.47),
                 Color(red: 0.11, green: 0.40, blue: 0.24)
-            ]
-        case .midnight:
-            return [
-                Color(red: 0.36, green: 0.24, blue: 0.60),
-                Color(red: 0.10, green: 0.11, blue: 0.29)
             ]
         case .sunsetAura:
             return [
@@ -196,10 +199,86 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.97, green: 0.34, blue: 0.65),
                 Color(red: 1.00, green: 0.35, blue: 0.35)
             ]
-        case .electricNight:
+        }
+    }
+
+    private var darkBackgroundColors: [Color] {
+        switch self {
+        case .sunrise:
             return [
-                Color(red: 0.10, green: 0.09, blue: 0.33),
-                Color(red: 0.26, green: 0.78, blue: 0.67)
+                Color(red: 0.60, green: 0.44, blue: 0.13),
+                Color(red: 0.59, green: 0.35, blue: 0.10)
+            ]
+        case .amber:
+            return [
+                Color(red: 0.60, green: 0.38, blue: 0.17),
+                Color(red: 0.56, green: 0.20, blue: 0.12)
+            ]
+        case .ocean:
+            return [
+                Color(red: 0.13, green: 0.35, blue: 0.54),
+                Color(red: 0.01, green: 0.20, blue: 0.36)
+            ]
+        case .forest:
+            return [
+                Color(red: 0.20, green: 0.43, blue: 0.28),
+                Color(red: 0.07, green: 0.24, blue: 0.14)
+            ]
+        case .sunsetAura:
+            return [
+                Color(red: 0.60, green: 0.22, blue: 0.26),
+                Color(red: 0.60, green: 0.46, blue: 0.26)
+            ]
+        case .oceanDeep:
+            return [
+                Color(red: 0.11, green: 0.11, blue: 0.34),
+                Color(red: 0.07, green: 0.60, blue: 0.60)
+            ]
+        case .cosmicPurple:
+            return [
+                Color(red: 0.30, green: 0.00, blue: 0.60),
+                Color(red: 0.53, green: 0.00, blue: 0.60)
+            ]
+        case .mintBreeze:
+            return [
+                Color(red: 0.28, green: 0.56, blue: 0.47),
+                Color(red: 0.22, green: 0.52, blue: 0.40),
+                Color(red: 0.14, green: 0.52, blue: 0.35)
+            ]
+        case .lavaBurst:
+            return [
+                Color(red: 0.59, green: 0.16, blue: 0.25),
+                Color(red: 0.15, green: 0.22, blue: 0.59)
+            ]
+        case .iceCrystal:
+            return [
+                Color(red: 0.38, green: 0.46, blue: 0.59),
+                Color(red: 0.46, green: 0.55, blue: 0.59)
+            ]
+        case .coralSunset:
+            return [
+                Color(red: 0.60, green: 0.36, blue: 0.24),
+                Color(red: 0.60, green: 0.22, blue: 0.23)
+            ]
+        case .auroraGlow:
+            return [
+                Color(red: 0.00, green: 0.58, blue: 0.38),
+                Color(red: 0.00, green: 0.51, blue: 0.58)
+            ]
+        case .forestEmerald:
+            return [
+                Color(red: 0.04, green: 0.36, blue: 0.34),
+                Color(red: 0.13, green: 0.56, blue: 0.29)
+            ]
+        case .skyMorning:
+            return [
+                Color(red: 0.19, green: 0.40, blue: 0.60),
+                Color(red: 0.00, green: 0.57, blue: 0.59)
+            ]
+        case .pinkNebula:
+            return [
+                Color(red: 0.58, green: 0.20, blue: 0.39),
+                Color(red: 0.60, green: 0.21, blue: 0.21)
             ]
         }
     }
@@ -225,11 +304,6 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
             return [
                 Color(red: 0.63, green: 0.87, blue: 0.58),
                 Color(red: 0.20, green: 0.55, blue: 0.35)
-            ]
-        case .midnight:
-            return [
-                Color(red: 0.74, green: 0.51, blue: 0.98),
-                Color(red: 0.40, green: 0.23, blue: 0.67)
             ]
         case .sunsetAura:
             return [
@@ -285,11 +359,6 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
             return [
                 Color(red: 0.98, green: 0.45, blue: 0.71),
                 Color(red: 1.00, green: 0.45, blue: 0.45)
-            ]
-        case .electricNight:
-            return [
-                Color(red: 0.23, green: 0.21, blue: 0.52),
-                Color(red: 0.38, green: 0.84, blue: 0.74)
             ]
         }
     }

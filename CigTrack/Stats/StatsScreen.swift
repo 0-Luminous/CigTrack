@@ -36,7 +36,7 @@ struct StatsScreen: View {
 
     var body: some View {
         ZStack {
-            backgroundStyle.backgroundGradient
+            backgroundStyle.backgroundGradient(for: colorScheme)
                 .ignoresSafeArea()
 
             ScrollView {

@@ -12,10 +12,20 @@ import CoreData
 struct PuffQuestApp: App {
     private let persistenceController = PersistenceController.shared
     @StateObject private var appViewModel = AppViewModel(context: PersistenceController.shared.container.viewContext)
+    @AppStorage("appPreferredColorScheme") private var appPreferredColorSchemeRaw: Int = 0
+    
+    private var preferredColorScheme: ColorScheme? {
+        switch appPreferredColorSchemeRaw {
+        case 1: return .light
+        case 2: return .dark
+        default: return nil
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
             RootView()
+                .preferredColorScheme(preferredColorScheme)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(appViewModel)
         }

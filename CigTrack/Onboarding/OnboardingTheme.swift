@@ -142,14 +142,8 @@ struct PrimaryGradientButtonStyle: ButtonStyle {
             .font(.headline)
             .padding(.vertical, 16)
             .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(OnboardingTheme.primaryGradient)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24, style: .continuous)
-                            .stroke(Color.white.opacity(configuration.isPressed ? 0.4 : 0.25), lineWidth: 1)
-                    )
-                    .shadow(color: OnboardingTheme.accentEnd.opacity(0.35), radius: 30, x: 0, y: 12)
+            .glassEffect(
+                .clear.interactive()
             )
             .foregroundStyle(Color.black.opacity(0.9))
             .scaleEffect(configuration.isPressed ? 0.98 : 1)

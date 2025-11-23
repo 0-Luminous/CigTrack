@@ -7,20 +7,32 @@ struct OnboardingDetailsView: View {
     let onboardingCompleted: (NicotineProfile) -> Void
     let onBack: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
+    @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexDark") private var backgroundIndexDark: Int = DashboardBackgroundStyle.defaultDark.rawValue
+    @AppStorage("appearanceStylesMigrated") private var appearanceStylesMigrated = false
+
     @State private var errorMessage: String?
     @State private var isCurrencySheetPresented = false
     @State private var currencySearchText = ""
 
+    private var backgroundStyle: DashboardBackgroundStyle { style(for: colorScheme) }
+    private var backgroundGradient: LinearGradient { backgroundStyle.backgroundGradient(for: colorScheme) }
+    private var primaryTextColor: Color { backgroundStyle.primaryTextColor(for: colorScheme) }
+    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor }
+
     var body: some View {
         ZStack {
-            OnboardingBackgroundView()
+            backgroundGradient
+                .ignoresSafeArea()
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 28) {
                     GlassSection("onboarding_section_currency") {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("onboarding_currency_picker_title")
                                 .font(.subheadline)
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(primaryTextColor.opacity(0.8))
                             currencyButton
                         }
                     }
@@ -47,10 +59,11 @@ struct OnboardingDetailsView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("onboarding_helper_section")
                                     .font(.headline)
+                                    .foregroundStyle(primaryTextColor)
                                 ForEach(helperTexts, id: \.self) { message in
                                     Text(message)
                                         .font(.footnote)
-                                        .foregroundStyle(.white.opacity(0.8))
+                                        .foregroundStyle(primaryTextColor.opacity(0.85))
                                 }
                             }
                         }
@@ -67,7 +80,7 @@ struct OnboardingDetailsView: View {
                 Button(action: onBack) {
                     Label("back_button", systemImage: "chevron.left")
                         .labelStyle(.titleAndIcon)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(primaryTextColor)
                 }
             }
         }
@@ -83,6 +96,7 @@ struct OnboardingDetailsView: View {
                 Button(action: submit) {
                     Text("onboarding_continue")
                         .frame(maxWidth: .infinity)
+                        .foregroundStyle(primaryTextColor)
                 }
                 .buttonStyle(PrimaryGradientButtonStyle())
                 .disabled(!viewModel.isCurrentFormValid)
@@ -115,15 +129,20 @@ struct OnboardingDetailsView: View {
     private var formContent: some View {
         switch method {
         case .cigarettes:
-            CigarettesFormView(config: $viewModel.cigarettesConfig)
+            CigarettesFormView(primaryTextColor: primaryTextColor,
+                               config: $viewModel.cigarettesConfig)
         case .disposableVape:
-            DisposableVapeFormView(config: $viewModel.disposableVapeConfig)
+            DisposableVapeFormView(primaryTextColor: primaryTextColor,
+                                   config: $viewModel.disposableVapeConfig)
         case .refillableVape:
-            RefillableVapeFormView(config: $viewModel.refillableVapeConfig)
+            RefillableVapeFormView(primaryTextColor: primaryTextColor,
+                                   config: $viewModel.refillableVapeConfig)
         case .heatedTobacco:
-            HeatedTobaccoFormView(config: $viewModel.heatedTobaccoConfig)
+            HeatedTobaccoFormView(primaryTextColor: primaryTextColor,
+                                  config: $viewModel.heatedTobaccoConfig)
         case .snusOrPouches:
-            SnusFormView(config: $viewModel.snusConfig)
+            SnusFormView(primaryTextColor: primaryTextColor,
+                         config: $viewModel.snusConfig)
         }
     }
 
@@ -142,14 +161,14 @@ struct OnboardingDetailsView: View {
                 VStack(alignment: .leading) {
                     Text(selectedCurrencyDescription)
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(primaryTextColor)
                     Text(viewModel.currency(for: method).localizedName)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(primaryTextColor)
                 }
                 Spacer()
                 Image(systemName: "chevron.up.chevron.down")
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(primaryTextColor.opacity(0.75))
             }
             .glassInputStyle()
         }
@@ -169,6 +188,19 @@ struct OnboardingDetailsView: View {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
+        ensureAppearanceMigration()
+        let index = scheme == .dark ? backgroundIndexDark : backgroundIndexLight
+        return DashboardBackgroundStyle(rawValue: index) ?? DashboardBackgroundStyle.default(for: scheme)
+    }
+
+    private func ensureAppearanceMigration() {
+        guard !appearanceStylesMigrated else { return }
+        backgroundIndexLight = legacyBackgroundIndex
+        backgroundIndexDark = legacyBackgroundIndex
+        appearanceStylesMigrated = true
     }
 }
 

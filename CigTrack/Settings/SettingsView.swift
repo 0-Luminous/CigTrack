@@ -100,7 +100,9 @@ struct SettingsView: View {
 }
 
 private extension SettingsView {
-    private var primaryTextColor: Color { backgroundStyle.primaryTextColor }
+    private var primaryTextColor: Color {
+        backgroundStyle.primaryTextColor(for: colorScheme)
+    }
     private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
         ensureAppearanceMigration()
         let index = backgroundIndex(for: scheme)
@@ -157,16 +159,17 @@ private extension SettingsView {
 
                         Image(systemName: "paintpalette.fill")
                             .font(.title2.weight(.semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(primaryTextColor)
                             .shadow(color: .white.opacity(0.5), radius: 12)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Dashboard style")
+                        Text("Application theme")
                             .font(.body.weight(.semibold))
+                            .foregroundStyle(primaryTextColor)
                         Text(backgroundStyle.name)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(primaryTextColor)
                     }
             
                 }
@@ -174,32 +177,31 @@ private extension SettingsView {
                 .padding(.vertical, 14)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 24))
+                .shadow(color: .black.opacity(0.5), radius: 12, x: 0, y: 8)
             }
             .overlay(alignment: .trailing) {
                 Circle()
                         .glassEffect(.clear)           
-                        .frame(width: 46, height: 46)
+                        .frame(width: 40, height: 40)
                         .overlay(
                             Image(systemName: "arrow.right")
                                 .font(.system(size: 18, weight: .semibold))
-                                .foregroundStyle(Color.white)
+                                .foregroundStyle(primaryTextColor)
                         )
-                        .padding(18)
+                        .padding(12)
             }
             .buttonStyle(.plain)
         }
     }
 
     var guidanceSection: some View {
-        settingsCard(title: "Guidance") {
+        settingsCard(title: "App mode") {
             VStack(alignment: .leading, spacing: 16) {
                 ModeSpotlightCardView(mode: selectedMode,
                                       arrowColor: primaryTextColor) {
                     showModePicker = true
                 }
-                Text("Switch between focus modes to adjust the motivation and guidance you see across the app.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                .shadow(color: .black.opacity(0.5), radius: 12, x: 0, y: 8)
             }
         }
     }
@@ -246,12 +248,14 @@ private extension SettingsView {
             Button {
                 showModePicker = false
             } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 28, weight: .semibold))
+                Image(systemName: "xmark")
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(.white)
                     .shadow(radius: 8)
-                    .padding()
+                    .padding(10)
+                    .glassEffect(.clear.interactive())
             }
+            .padding(.trailing, 20)
         }
     }
 
@@ -262,6 +266,7 @@ private extension SettingsView {
             SettingsMethodCardView(method: selectedMethod,
                                    backgroundStyle: backgroundStyle)
         }
+        .shadow(color: .black.opacity(0.5), radius: 12, x: 0, y: 8)
         .buttonStyle(.plain)
     }
 
@@ -275,11 +280,7 @@ private extension SettingsView {
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(cardStrokeColor, lineWidth: 1)
-        )
+        .glassEffect(.clear, in: .rect(cornerRadius: 24))
     }
 
     func nicotineMethod(for product: ProductType) -> NicotineMethod {

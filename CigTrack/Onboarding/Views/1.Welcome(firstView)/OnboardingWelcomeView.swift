@@ -1,6 +1,6 @@
 import SwiftUI
 #if os(iOS)
-import UIKit
+    import UIKit
 #endif
 
 struct OnboardingWelcomeView: View {
@@ -14,18 +14,20 @@ struct OnboardingWelcomeView: View {
     var body: some View {
         GeometryReader { proxy in
             pager(size: proxy.size, safeAreaInsets: proxy.safeAreaInsets)
-                .frame(width: proxy.size.width, height: proxy.size.height)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
         }
     }
 
     private func pager(size: CGSize, safeAreaInsets: EdgeInsets) -> some View {
         let width = size.width
+        let fullHeight = size.height + safeAreaInsets.top + safeAreaInsets.bottom
         let currentIndex = index(for: selectedMode)
         let dragProgress = width == 0 ? 0 : dragOffset / width
 
         return ZStack {
             backgroundLayer(size: size,
+                            fullHeight: fullHeight,
                             currentIndex: currentIndex,
                             dragProgress: dragProgress)
 
@@ -36,7 +38,7 @@ struct OnboardingWelcomeView: View {
                               selectedMode: selectedMode,
                               onStart: onStart,
                               safeAreaInsets: safeAreaInsets)
-                        .frame(width: width, height: size.height)
+                        .frame(width: width, height: fullHeight)
                         .scaleEffect(mode == selectedMode ? 1 : 0.96)
                         .opacity(mode == selectedMode ? 1 : 0.72)
                         .animation(.easeInOut(duration: 0.25), value: selectedMode)
@@ -72,37 +74,39 @@ struct OnboardingWelcomeView: View {
     }
 
     private func provideHapticFeedback() {
-#if os(iOS)
-        UISelectionFeedbackGenerator().selectionChanged()
-#endif
+        #if os(iOS)
+            UISelectionFeedbackGenerator().selectionChanged()
+        #endif
     }
 
     @ViewBuilder
     private func backgroundLayer(size: CGSize,
+                                 fullHeight: CGFloat,
                                  currentIndex: Int,
-                                 dragProgress: CGFloat) -> some View {
+                                 dragProgress: CGFloat) -> some View
+    {
         let clamped = max(-1, min(1, dragProgress))
         let baseOpacity = 1 - min(1, abs(clamped))
 
-        backgroundImage(for: selectedMode, size: size)
+        backgroundImage(for: selectedMode, size: size, fullHeight: fullHeight)
             .opacity(baseOpacity)
 
         if clamped != 0 {
             let direction = clamped < 0 ? 1 : -1
             let targetIndex = currentIndex + direction
             if modes.indices.contains(targetIndex) {
-                backgroundImage(for: modes[targetIndex], size: size)
+                backgroundImage(for: modes[targetIndex], size: size, fullHeight: fullHeight)
                     .opacity(min(1, abs(clamped)))
             }
         }
     }
 
-    private func backgroundImage(for mode: OnboardingMode, size: CGSize) -> some View {
+    private func backgroundImage(for mode: OnboardingMode, size: CGSize, fullHeight: CGFloat) -> some View {
         Image(mode.backgroundImageName)
             .resizable()
             .scaledToFill()
             .frame(width: size.width,
-                   height: size.height,
+                   height: fullHeight,
                    alignment: .bottom) // keep bottom content visible
             .clipped()
             .ignoresSafeArea()
@@ -115,6 +119,10 @@ private struct ModeSlide: View {
     let selectedMode: OnboardingMode
     let onStart: () -> Void
     let safeAreaInsets: EdgeInsets
+
+    private var isComingSoon: Bool {
+        mode == .gradualReduction || mode == .quitNow
+    }
 
     var body: some View {
         ZStack {
@@ -169,7 +177,7 @@ private struct ModeSlide: View {
                 .glassEffect(
                     .clear,
                     in: .rect(cornerRadius: 24)
-                    )
+                )
 
                 VStack(alignment: .leading, spacing: 10) {
                     ModeIndicator(selectedMode: selectedMode)
@@ -182,24 +190,26 @@ private struct ModeSlide: View {
                         Spacer()
                     }
                 }
-                Button(action: onStart) {
-                    Text("onboarding_primary_cta")
+                Button(action: handleStart) {
+                    Text(isComingSoon ? "onboarding_mode_coming_soon" : "onboarding_primary_cta")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(buttonForegroundStyle)
                         .padding(.vertical, 16)
                         .frame(maxWidth: .infinity)
                 }
-                .contentShape(Capsule())
+                .glassEffect(.clear.interactive())
                 .background(
                     Capsule()
-                        .fill(Color.blue)
+                        .fill(buttonFillStyle)
                 )
-                .shadow(color: Color.blue.opacity(0.3), radius: 18, x: 0, y: 10)
-                .accessibilityHint(Text("onboarding_primary_cta_hint"))
+                .shadow(color: buttonShadowColor, radius: 18, x: 0, y: 10)
+                .accessibilityHint(Text(isComingSoon ? "onboarding_mode_coming_soon" : "onboarding_primary_cta_hint"))
+                .disabled(isComingSoon)
+                .opacity(isComingSoon ? 0.9 : 1)
             }
             .frame(maxWidth: 520, alignment: .leading)
             .padding(.horizontal, 24)
-            .padding(.bottom, 10)
+            .padding(.bottom, safeAreaInsets.bottom + 10)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 LinearGradient(colors: [
@@ -207,11 +217,36 @@ private struct ModeSlide: View {
                     Color.black.opacity(0.9),
                     Color.black.opacity(0.65),
                     Color.black.opacity(0.25),
-                    Color.black.opacity(0.05)
+                    Color.black.opacity(0.05),
                 ], startPoint: .bottom, endPoint: .top)
                     .ignoresSafeArea(edges: .bottom)
             )
         }
+    }
+
+    private func handleStart() {
+        guard !isComingSoon else { return }
+        onStart()
+    }
+
+    private var buttonForegroundStyle: AnyShapeStyle {
+        if isComingSoon {
+            return AnyShapeStyle(OnboardingTheme.primaryGradient)
+        } else {
+            return AnyShapeStyle(Color.white)
+        }
+    }
+
+    private var buttonFillStyle: AnyShapeStyle {
+        if isComingSoon {
+            return AnyShapeStyle(Color.white.opacity(0.12))
+        } else {
+            return AnyShapeStyle(OnboardingTheme.primaryGradient)
+        }
+    }
+
+    private var buttonShadowColor: Color {
+        isComingSoon ? Color.black.opacity(0.25) : OnboardingTheme.accentEnd.opacity(0.4)
     }
 }
 

@@ -47,6 +47,12 @@
 "XP" = "XP";
 "Coins" = "Монеты";
 "Streaks" = "Серии";
+"App mode" = "Режим приложения";
+"Application theme" = "Тема приложения";
+"Select the method of use" = "Выберите метод употребления";
+"Pick the nicotine method you want to track." = "Выберите способ употребления никотина, который вы хотите отслеживать.";
+"This keeps reminders, stats, and budgeting focused on the right product." = "Это помогает держать напоминания, статистику и бюджетирование сосредоточенными на нужном продукте.";
+"Select the method of use" = "Выберите способ употребления.";
 
 /* Экран статистики */
 "stats_chart_weekly_trend" = "Недельная динамика";
@@ -88,6 +94,7 @@
 "onboarding_welcome_subtitle" = "Отслеживай никотин, расходы и прогресс в одном месте.";
 "onboarding_primary_cta" = "Поехали";
 "onboarding_primary_cta_hint" = "Откроет выбор способа";
+"onboarding_mode_coming_soon" = "Скоро";
 "onboarding_mode_picker_title" = "Выберите режим";
 "onboarding_mode_picker_subtitle" = "Свайпайте влево или вправо, чтобы выбрать комфортный сценарий.";
 "onboarding_mode_swipe_hint" = "Свайпайте, чтобы посмотреть все режимы.";

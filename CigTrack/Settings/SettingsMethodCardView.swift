@@ -3,11 +3,14 @@ import SwiftUI
 struct SettingsMethodCardView: View {
     let method: NicotineMethod
     let backgroundStyle: DashboardBackgroundStyle
+    @Environment(\.colorScheme) private var colorScheme
 
     private let cardShape = RoundedRectangle(cornerRadius: 26, style: .continuous)
     private let iconShape = RoundedRectangle(cornerRadius: 20, style: .continuous)
 
-    private var primaryTextColor: Color { backgroundStyle.primaryTextColor }
+    private var primaryTextColor: Color {
+        backgroundStyle.primaryTextColor(for: colorScheme)
+    }
     private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor.opacity(0.9) }
 
     private var isLightBackground: Bool {
@@ -46,7 +49,7 @@ struct SettingsMethodCardView: View {
                             .font(.caption2.weight(.semibold))
                             .textCase(.uppercase)
                             .tracking(1.8)
-                            .foregroundStyle(.white.opacity(0.85))
+                            .foregroundStyle(primaryTextColor)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 4)
                             .glassEffect(.clear)
@@ -60,7 +63,7 @@ struct SettingsMethodCardView: View {
 
                 Text(LocalizedStringKey(method.descriptionKey))
                     .font(.subheadline)
-                    .foregroundStyle(secondaryTextColor)
+                    .foregroundStyle(primaryTextColor)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -98,14 +101,13 @@ struct SettingsMethodCardView: View {
 
     private var arrowIndicator: some View {
         Circle()
-            .glassEffect(.clear)
-            .frame(width: 46, height: 46)
+            .glassEffect(.clear)           
+            .frame(width: 40, height: 40)
             .overlay(
                 Image(systemName: "arrow.right")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(primaryTextColor)
-            )
-            .padding(18)
-            .allowsHitTesting(false)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(primaryTextColor)
+                )
+                .padding(12)
     }
 }

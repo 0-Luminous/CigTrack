@@ -3,6 +3,19 @@ import SwiftUI
 struct MethodCardView: View {
     let method: NicotineMethod
     let isSelected: Bool
+    @Environment(\.colorScheme) private var colorScheme
+
+    @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexDark") private var backgroundIndexDark: Int = DashboardBackgroundStyle.defaultDark.rawValue
+    @AppStorage("appearanceStylesMigrated") private var appearanceStylesMigrated = false
+
+    private var backgroundStyle: DashboardBackgroundStyle {
+        style(for: colorScheme)
+    }
+    private var primaryTextColor: Color {
+        backgroundStyle.primaryTextColor(for: colorScheme)
+    }
 
     var body: some View {
         GlassCard {
@@ -23,10 +36,10 @@ struct MethodCardView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(LocalizedStringKey(method.localizationKey))
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(primaryTextColor)
                     Text(LocalizedStringKey(method.descriptionKey))
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.65))
+                        .foregroundStyle(primaryTextColor)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
@@ -34,18 +47,31 @@ struct MethodCardView: View {
 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(OnboardingTheme.accentStart)
+                        .foregroundStyle(primaryTextColor)
                         .font(.title2)
                         .accessibilityHidden(true)
                 }
             }
         }
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(isSelected ? OnboardingTheme.accentStart : Color.clear, lineWidth: 2)
+        .glassEffect(
+            .clear.interactive(),
+            in: .rect(cornerRadius: 24)
         )
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .animation(.easeInOut(duration: 0.2), value: isSelected)
+    }
+
+    private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
+        ensureAppearanceMigration()
+        let index = scheme == .dark ? backgroundIndexDark : backgroundIndexLight
+        return DashboardBackgroundStyle(rawValue: index) ?? DashboardBackgroundStyle.default(for: scheme)
+    }
+
+    private func ensureAppearanceMigration() {
+        guard !appearanceStylesMigrated else { return }
+        backgroundIndexLight = legacyBackgroundIndex
+        backgroundIndexDark = legacyBackgroundIndex
+        appearanceStylesMigrated = true
     }
 }

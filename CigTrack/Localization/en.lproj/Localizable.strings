@@ -47,6 +47,12 @@
 "XP" = "XP";
 "Coins" = "Coins";
 "Streaks" = "Streaks";
+"App mode" = "App mode";
+"Application theme" = "Application theme";
+"Select the method of use" = "Select the method of use";
+"Pick the nicotine method you want to track." = "Pick the nicotine method you want to track.";
+"This keeps reminders, stats, and budgeting focused on the right product." = "This keeps reminders, stats, and budgeting focused on the right product.";
+"Select the method of use" = "Select the method of use";
 
 /* Stats screen */
 "stats_chart_weekly_trend" = "Weekly trend";
@@ -88,6 +94,7 @@
 "onboarding_welcome_subtitle" = "Track nicotine, spending, and progress in one place.";
 "onboarding_primary_cta" = "Get started";
 "onboarding_primary_cta_hint" = "Opens nicotine method selection";
+"onboarding_mode_coming_soon" = "Coming soon";
 "onboarding_mode_picker_title" = "Choose your mode";
 "onboarding_mode_picker_subtitle" = "Swipe to match how you plan to use the app.";
 "onboarding_mode_swipe_hint" = "Swipe left or right to explore each mode.";

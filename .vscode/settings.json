@@ -1,0 +1,5 @@
+{
+    "editor.defaultFormatter": "swiftlang.swift-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+}

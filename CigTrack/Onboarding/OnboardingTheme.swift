@@ -97,19 +97,10 @@ struct GlassCard<Content: View>: View {
         content
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .fill(Color.white.opacity(0.04))
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .stroke(OnboardingTheme.glassStroke, lineWidth: 1)
-                    )
-            )
+            .glassEffect(
+                .clear,
+                in: .rect(cornerRadius: 24)
+                )
             .shadow(color: Color.black.opacity(0.45), radius: 26, x: 0, y: 18)
     }
 }

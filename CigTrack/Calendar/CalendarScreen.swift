@@ -23,7 +23,9 @@ struct CalendarScreen: View {
     private var backgroundGradient: LinearGradient {
         backgroundStyle.backgroundGradient(for: colorScheme)
     }
-    private var primaryTextColor: Color { backgroundStyle.primaryTextColor }
+    private var primaryTextColor: Color {
+        backgroundStyle.primaryTextColor(for: colorScheme)
+    }
     private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor }
     private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
         ensureAppearanceMigration()
@@ -488,12 +490,12 @@ private struct DailyDetailSheet: View {
 
                 List {
                     Section(header: Text(formattedDate)
-                        .foregroundStyle(backgroundStyle.primaryTextColor)) {
+                        .foregroundStyle(primaryTextColor)) {
                         ForEach(entries) { entry in
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(timeString(for: entry.createdAt ?? Date()))
                                     .font(.headline)
-                                    .foregroundStyle(backgroundStyle.primaryTextColor)
+                                    .foregroundStyle(primaryTextColor)
                                 Text(consumptionDescription(for: entry))
                                     .font(.caption)
                                     .foregroundStyle(backgroundStyle.secondaryTextColor)
@@ -552,6 +554,10 @@ private struct DailyDetailSheet: View {
 
     private var backgroundStyle: DashboardBackgroundStyle {
         style(for: colorScheme)
+    }
+
+    private var primaryTextColor: Color {
+        backgroundStyle.primaryTextColor(for: colorScheme)
     }
 
     private var backgroundGradient: LinearGradient {

@@ -4,6 +4,7 @@ struct ModeSpotlightCardView: View {
     let mode: OnboardingMode
     let arrowColor: Color
     let action: () -> Void
+    
 
     private let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
 
@@ -27,13 +28,6 @@ struct ModeSpotlightCardView: View {
             .background(backgroundLayer)
             .clipShape(shape)
             .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 26))
-//            .overlay(shape.strokeBorder(Color.white.opacity(0.22), lineWidth: 1))
-//            .overlay(
-//                shape
-//                    .strokeBorder(Color.white.opacity(0.4), lineWidth: 0.5)
-//                    .blur(radius: 4)
-//                    .opacity(0.7)
-//            )
             .shadow(color: mode.spotlightAccentGradient.shadow.opacity(0.25), radius: 24, x: 0, y: 16)
         }
         .buttonStyle(.plain)
@@ -73,10 +67,6 @@ struct ModeSpotlightCardView: View {
             Circle()
                 .glassEffect(.clear)
                 .frame(width: 56, height: 56)
-                // .overlay(
-                //     Circle()
-                //         .stroke(Color.white.opacity(0.35), lineWidth: 1)
-                // )
 
             Image(systemName: mode.spotlightSymbolName)
                 .font(.system(size: 22, weight: .semibold))

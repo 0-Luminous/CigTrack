@@ -41,6 +41,9 @@ struct MainDashboardView: View {
     private var backgroundStyle: DashboardBackgroundStyle {
         style(for: colorScheme)
     }
+    private var primaryTextColor: Color {
+        backgroundStyle.primaryTextColor(for: colorScheme)
+    }
 
     private let clock = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private let holdDuration: TimeInterval = 1.1
@@ -85,11 +88,11 @@ struct MainDashboardView: View {
                         Text(remainingLabel)
                             .font(.system(size: 16, weight: .semibold))
                             .tracking(1.2)
-                            .foregroundStyle(backgroundStyle.primaryTextColor)
+                            .foregroundStyle(primaryTextColor)
 
                         Text("\(nextEntryLabel)".uppercased())
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(backgroundStyle.secondaryTextColor)
+                            .foregroundStyle(primaryTextColor)
                     }
 
                     Spacer()
@@ -177,7 +180,7 @@ private extension MainDashboardView {
                 
             Text("\(todayCount)")
                 .font(.system(size: 120, weight: .bold, design: .rounded))
-                .foregroundStyle(backgroundStyle.circleTextColor)
+                .foregroundStyle(primaryTextColor)
                 .allowsHitTesting(false)
         }
         .frame(width: 260, height: 260)
@@ -218,7 +221,7 @@ private extension MainDashboardView {
             if !hasLoggedEntries {
                 Text(NSLocalizedString("Start logging to enable the timer", comment: "timer empty state hint"))
                     .font(.footnote)
-                    .foregroundStyle(backgroundStyle.secondaryTextColor)
+                    .foregroundStyle(primaryTextColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -236,10 +239,10 @@ private extension MainDashboardView {
             Text(title.uppercased())
                 .font(.system(size: 11, weight: .semibold))
                 .tracking(1)
-                .foregroundStyle(backgroundStyle.secondaryTextColor)
+                .foregroundStyle(primaryTextColor)
             Text(value)
                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(isActive ? backgroundStyle.primaryTextColor : backgroundStyle.secondaryTextColor)
+                .foregroundStyle(primaryTextColor)
                 .monospacedDigit()
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)

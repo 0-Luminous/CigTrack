@@ -5,10 +5,22 @@ struct CurrencyPickerSheet: View {
     @Binding var selection: Currency
     @Binding var searchText: String
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+
+    @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
+    @AppStorage("dashboardBackgroundIndexDark") private var backgroundIndexDark: Int = DashboardBackgroundStyle.defaultDark.rawValue
+    @AppStorage("appearanceStylesMigrated") private var appearanceStylesMigrated = false
+
+    private var backgroundStyle: DashboardBackgroundStyle { style(for: colorScheme) }
+    private var backgroundGradient: LinearGradient { backgroundStyle.backgroundGradient(for: colorScheme) }
+    private var primaryTextColor: Color { backgroundStyle.primaryTextColor(for: colorScheme) }
+    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor }
 
     var body: some View {
         ZStack {
-            OnboardingBackgroundView()
+            backgroundGradient
+                .ignoresSafeArea()
             ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(filteredCurrencies) { currency in
@@ -20,10 +32,10 @@ struct CurrencyPickerSheet: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(" \(currency.code)")
                                         .font(.headline)
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(primaryTextColor)
                                     Text(currency.localizedName)
                                         .font(.caption)
-                                        .foregroundStyle(.white.opacity(0.7))
+                                        .foregroundStyle(primaryTextColor.opacity(0.7))
                                 }
                                 Spacer()
                                 if currency.code == selection.code {
@@ -69,5 +81,18 @@ struct CurrencyPickerSheet: View {
             currency.localizedName.lowercased().contains(term) ||
             currency.symbol.lowercased().contains(term)
         }
+    }
+
+    private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
+        ensureAppearanceMigration()
+        let index = scheme == .dark ? backgroundIndexDark : backgroundIndexLight
+        return DashboardBackgroundStyle(rawValue: index) ?? DashboardBackgroundStyle.default(for: scheme)
+    }
+
+    private func ensureAppearanceMigration() {
+        guard !appearanceStylesMigrated else { return }
+        backgroundIndexLight = legacyBackgroundIndex
+        backgroundIndexDark = legacyBackgroundIndex
+        appearanceStylesMigrated = true
     }
 }

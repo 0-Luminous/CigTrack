@@ -1,6 +1,6 @@
 import SwiftUI
 
-private let packPriceLimit: Decimal = 99_000_000
+private let priceLimit: Decimal = 99_000_000
 
 struct CigarettesFormView: View {
     let primaryTextColor: Color
@@ -32,8 +32,8 @@ struct CigarettesFormView: View {
                             primaryTextColor: primaryTextColor)
             }
             .onChange(of: config.packPrice) { newValue in
-                if newValue > packPriceLimit {
-                    config.packPrice = packPriceLimit
+                if newValue > priceLimit {
+                    config.packPrice = priceLimit
                 }
             }
         }
@@ -63,6 +63,11 @@ struct DisposableVapeFormView: View {
                              primaryTextColor: primaryTextColor)
                 InfoTipView(textKey: "device_price_tip",
                             primaryTextColor: primaryTextColor)
+            }
+            .onChange(of: config.devicePrice) { newValue in
+                if newValue > priceLimit {
+                    config.devicePrice = priceLimit
+                }
             }
         }
     }
@@ -118,6 +123,16 @@ struct RefillableVapeFormView: View {
                 InfoTipView(textKey: "refillable_price_tip",
                             primaryTextColor: primaryTextColor)
             }
+            .onChange(of: config.liquidPrice) { newValue in
+                if newValue > priceLimit {
+                    config.liquidPrice = priceLimit
+                }
+            }
+            .onChange(of: config.coilPrice) { newValue in
+                if let newValue, newValue > priceLimit {
+                    config.coilPrice = priceLimit
+                }
+            }
         }
     }
 
@@ -160,8 +175,8 @@ struct HeatedTobaccoFormView: View {
                              primaryTextColor: primaryTextColor)
             }
             .onChange(of: config.packPrice) { newValue in
-                if newValue > packPriceLimit {
-                    config.packPrice = packPriceLimit
+                if newValue > priceLimit {
+                    config.packPrice = priceLimit
                 }
             }
         }
@@ -194,6 +209,11 @@ struct SnusFormView: View {
                              placeholderKey: "snus_can_price_placeholder",
                              value: $config.canPrice,
                              primaryTextColor: primaryTextColor)
+            }
+            .onChange(of: config.canPrice) { newValue in
+                if newValue > priceLimit {
+                    config.canPrice = priceLimit
+                }
             }
         }
     }
@@ -340,11 +360,10 @@ private extension Binding where Value == Decimal? {
                 return NSDecimalNumber(decimal: decimal).doubleValue
             },
             set: { newValue in
-                if let newValue {
-                    self.wrappedValue = Decimal(newValue)
-                } else {
-                    self.wrappedValue = nil
-                }
+                let resolved = newValue ?? 0
+                let limit = NSDecimalNumber(decimal: priceLimit).doubleValue
+                let clamped = Swift.min(resolved, limit)
+                self.wrappedValue = Decimal(clamped)
             }
         )
     }

@@ -245,14 +245,17 @@ extension SnusConfig: OnboardingValidatable {
 
 enum CurrencyRepository {
     static var supportedCurrencies: [Currency] {
-        Locale.isoCurrencyCodes
+        Locale.commonISOCurrencyCodes
             .sorted()
             .map { Currency(code: $0) }
     }
 
     static func currency(for code: String?) -> Currency {
         guard let code = code else { return .default }
-        return Currency(code: code)
+        if Locale.commonISOCurrencyCodes.contains(code) {
+            return Currency(code: code)
+        }
+        return .default
     }
 }
 

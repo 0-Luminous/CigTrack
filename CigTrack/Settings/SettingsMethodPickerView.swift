@@ -5,7 +5,7 @@ struct SettingsMethodPickerView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let selectedMethod: NicotineMethod
-    let onMethodSelected: (NicotineMethod) -> Void
+    let onProfileSelected: (NicotineProfile) -> Void
 
     @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
     @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
@@ -102,7 +102,7 @@ struct SettingsMethodPickerView: View {
 
     private func handleProfileCompletion(_ profile: NicotineProfile) {
         localSelection = profile.method
-        onMethodSelected(profile.method)
+        onProfileSelected(profile)
         path = []
         dismiss()
     }
@@ -113,6 +113,12 @@ private enum SettingsMethodRoute: Hashable {
 }
 
 #Preview {
+    let profile = NicotineProfile(method: .cigarettes,
+                                  cigarettes: CigarettesConfig(),
+                                  disposableVape: nil,
+                                  refillableVape: nil,
+                                  heatedTobacco: nil,
+                                  snus: nil)
     SettingsMethodPickerView(selectedMethod: .cigarettes) { _ in }
         .preferredColorScheme(.dark)
 }

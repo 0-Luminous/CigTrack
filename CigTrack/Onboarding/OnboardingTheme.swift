@@ -149,14 +149,21 @@ struct GlassInputFieldModifier: ViewModifier {
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Color.white.opacity(0.05))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20, style: .continuous)
-                            .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                    )
+            .glassEffect(.clear.interactive())
+            .shadow(
+                color: Color.black.opacity(0.12),
+                radius: 20,
+                x: 0,
+                y: 10
             )
+            // .background(
+            //     RoundedRectangle(cornerRadius: 20, style: .continuous)
+            //         .fill(Color.white.opacity(0.05))
+            //         .overlay(
+            //             RoundedRectangle(cornerRadius: 20, style: .continuous)
+            //                 .stroke(Color.white.opacity(0.15), lineWidth: 1)
+            //         )
+            // )
     }
 }
 

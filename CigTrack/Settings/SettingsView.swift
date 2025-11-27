@@ -20,15 +20,19 @@ struct SettingsView: View {
     @State private var showAppearancePicker = false
     @State private var selectedMode: OnboardingMode = .tracking
     @State private var appearancePickerMode: ColorScheme? = nil
+    @State private var storedProfiles: [NicotineProfile] = []
     @AppStorage("appPreferredColorScheme") private var appPreferredColorSchemeRaw: Int = 0
+    @State private var editingProfile: NicotineProfile?
 
+    @State private var showMethodManager = false
+    private let savedMethodsStore = SavedMethodsStore()
     private var backgroundStyle: DashboardBackgroundStyle {
         style(for: colorScheme)
     }
 
     private var cardStrokeColor: Color {
         switch backgroundStyle {
-        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
+        case .sunrise, .melloYellow, .classic, .сyberSplash, .iceCrystal, .coralSunset, .auroraGlow, .frescoCrush:
             return Color.black.opacity(0.12)
         default:
             return Color.white.opacity(0.15)
@@ -68,11 +72,35 @@ struct SettingsView: View {
             ensureAppearanceMigration()
         }
         .fullScreenCover(isPresented: $showMethodPicker) {
-            SettingsMethodPickerView(selectedMethod: selectedMethod) { profile in
-                latestProfile = profile
-                selectedMethod = profile.method
-                dailyLimit = Double(dailyLimit(for: profile))
+            SettingsMethodPickerView(selectedMethod: selectedMethod,
+                                     editingProfile: editingProfile) { profile in
+                applyProfileSelection(profile)
+                editingProfile = nil
             }
+        }
+        .fullScreenCover(isPresented: $showMethodManager) {
+            SettingsMethodSelectionView(
+                backgroundStyle: backgroundStyle,
+                profiles: storedProfiles,
+                selectedMethod: selectedMethod,
+                onSelect: { profile in
+                    applyProfileSelection(profile)
+                    showMethodManager = false
+                },
+                onAdd: {
+                    editingProfile = nil
+                    showMethodManager = false
+                    showMethodPicker = true
+                },
+                onEdit: { profile in
+                    editingProfile = profile
+                    showMethodManager = false
+                    showMethodPicker = true
+                },
+                onDelete: { profile in
+                    deleteProfile(profile)
+                }
+            )
         }
         .fullScreenCover(isPresented: $showModePicker) {
             modePickerScreen
@@ -89,7 +117,12 @@ struct SettingsView: View {
     }
 
     private func synchronizeForm() {
-        selectedMethod = nicotineMethod(for: ProductType(rawValue: user.productType) ?? .cigarette)
+        refreshStoredProfiles()
+        if let profile = storedProfiles.first {
+            selectedMethod = profile.method
+        } else {
+            selectedMethod = nicotineMethod(for: ProductType(rawValue: user.productType) ?? .cigarette)
+        }
         dailyLimit = Double(user.dailyLimit)
         selectedMode = .tracking
     }
@@ -271,7 +304,7 @@ private extension SettingsView {
 
     var methodSelectionCard: some View {
         Button {
-            showMethodPicker = true
+            showMethodManager = true
         } label: {
             SettingsMethodCardView(method: selectedMethod,
                                    backgroundStyle: backgroundStyle)
@@ -362,6 +395,37 @@ private extension SettingsView {
         case .snusOrPouches:
             guard let price = profile.snus?.canPrice else { return 0 }
             return NSDecimalNumber(decimal: price).doubleValue
+        }
+    }
+
+    private func refreshStoredProfiles() {
+        let onboardingStore = InMemorySettingsStore()
+        let latestOnboardingProfile = onboardingStore.loadProfile()
+        storedProfiles = savedMethodsStore.mergeLatestOnboardingProfile(latestOnboardingProfile)
+    }
+
+    private func applyProfileSelection(_ profile: NicotineProfile, persist: Bool = true) {
+        latestProfile = profile
+        selectedMethod = profile.method
+        dailyLimit = Double(dailyLimit(for: profile))
+        if persist {
+            savedMethodsStore.save(profile: profile)
+        }
+        refreshStoredProfiles()
+    }
+
+    private func deleteProfile(_ profile: NicotineProfile) {
+        savedMethodsStore.delete(method: profile.method)
+        refreshStoredProfiles()
+        if selectedMethod == profile.method {
+            if let fallback = storedProfiles.first {
+                // Apply without re-saving since store already updated.
+                applyProfileSelection(fallback, persist: false)
+            } else {
+                selectedMethod = nicotineMethod(for: ProductType(rawValue: user.productType) ?? .cigarette)
+                dailyLimit = Double(user.dailyLimit)
+                latestProfile = nil
+            }
         }
     }
 

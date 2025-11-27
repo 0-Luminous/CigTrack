@@ -11,11 +11,11 @@ struct SettingsMethodCardView: View {
     private var primaryTextColor: Color {
         backgroundStyle.primaryTextColor(for: colorScheme)
     }
-    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor.opacity(0.9) }
+    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor(for: colorScheme).opacity(0.9) }
 
     private var isLightBackground: Bool {
         switch backgroundStyle {
-        case .sunrise, .amber:
+        case .sunrise, .melloYellow:
             return true
         default:
             return false

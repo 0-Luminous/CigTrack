@@ -5,7 +5,16 @@ struct SettingsMethodPickerView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let selectedMethod: NicotineMethod
+    let editingProfile: NicotineProfile?
     let onProfileSelected: (NicotineProfile) -> Void
+
+    init(selectedMethod: NicotineMethod,
+         editingProfile: NicotineProfile? = nil,
+         onProfileSelected: @escaping (NicotineProfile) -> Void) {
+        self.selectedMethod = selectedMethod
+        self.editingProfile = editingProfile
+        self.onProfileSelected = onProfileSelected
+    }
 
     @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
     @AppStorage("dashboardBackgroundIndexLight") private var backgroundIndexLight: Int = DashboardBackgroundStyle.default.rawValue
@@ -14,6 +23,7 @@ struct SettingsMethodPickerView: View {
     @StateObject private var onboardingViewModel = OnboardingViewModel()
     @State private var path: [SettingsMethodRoute] = []
     @State private var localSelection: NicotineMethod?
+    @State private var didSeedEditingProfile = false
 
     private let columns = [GridItem(.adaptive(minimum: 260), spacing: 20)]
     private var highlightedMethod: NicotineMethod { localSelection ?? selectedMethod }
@@ -64,6 +74,9 @@ struct SettingsMethodPickerView: View {
                 }
             }
         }
+        .onAppear {
+            seedEditingProfileIfNeeded()
+        }
     }
 
     private var header: some View {
@@ -105,6 +118,14 @@ struct SettingsMethodPickerView: View {
         onProfileSelected(profile)
         path = []
         dismiss()
+    }
+
+    private func seedEditingProfileIfNeeded() {
+        guard !didSeedEditingProfile, let editingProfile else { return }
+        onboardingViewModel.apply(profile: editingProfile)
+        localSelection = editingProfile.method
+        path = [.methodDetails(editingProfile.method)]
+        didSeedEditingProfile = true
     }
 }
 

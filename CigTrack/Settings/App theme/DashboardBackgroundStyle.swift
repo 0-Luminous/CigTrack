@@ -2,19 +2,19 @@ import SwiftUI
 
 enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
     case sunrise
-    case amber
+    case melloYellow
     case ocean
     case forest
-    case sunsetAura
+    case classic
     case oceanDeep
     case cosmicPurple
-    case mintBreeze
+    case сyberSplash
     case lavaBurst
     case iceCrystal
     case coralSunset
     case auroraGlow
-    case forestEmerald
-    case skyMorning
+    case virentia
+    case frescoCrush
     case pinkNebula
 
     static let `default`: DashboardBackgroundStyle = .iceCrystal
@@ -24,21 +24,21 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
     }
 
     static let appearanceOptions: [DashboardBackgroundStyle] = [
-        .sunsetAura,
+        .classic,
         .coralSunset,
         .sunrise,
-        .amber,
+        .melloYellow,
         .lavaBurst,
         .pinkNebula,
         .cosmicPurple,
         .oceanDeep,
         .ocean,
-        .skyMorning,
+        .frescoCrush,
         .iceCrystal,
         .forest,
         .auroraGlow,
-        .mintBreeze,
-        .forestEmerald,
+        .сyberSplash,
+        .virentia,
     ]
 
     var id: Int { rawValue }
@@ -47,19 +47,19 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
         switch self {
         case .iceCrystal: return NSLocalizedString("Ice Crystal", comment: "Dashboard background option")
         case .sunrise: return NSLocalizedString("Sunrise", comment: "Dashboard background option")
-        case .amber: return NSLocalizedString("Amber Glow", comment: "Dashboard background option")
-        case .sunsetAura: return NSLocalizedString("Sunset Aura", comment: "Dashboard background option")
+        case .melloYellow: return NSLocalizedString("Mello", comment: "Dashboard background option")
+        case .classic: return NSLocalizedString("Classic", comment: "Dashboard background option")
         case .coralSunset: return NSLocalizedString("Coral Sunset", comment: "Dashboard background option")
-        case .ocean: return NSLocalizedString("Ocean Tide", comment: "Dashboard background option")
-        case .skyMorning: return NSLocalizedString("Sky Morning", comment: "Dashboard background option")
-        case .forest: return NSLocalizedString("Forest Breeze", comment: "Dashboard background option")
-        case .oceanDeep: return NSLocalizedString("Ocean Deep", comment: "Dashboard background option")
-        case .mintBreeze: return NSLocalizedString("Mint Breeze", comment: "Dashboard background option")
+        case .ocean: return NSLocalizedString("Ocean", comment: "Dashboard background option")
+        case .frescoCrush: return NSLocalizedString("Fresco", comment: "Dashboard background option")
+        case .forest: return NSLocalizedString("Forest", comment: "Dashboard background option")
+        case .oceanDeep: return NSLocalizedString("Sky", comment: "Dashboard background option")
+        case .сyberSplash: return NSLocalizedString("Cyber", comment: "Dashboard background option")
         case .lavaBurst: return NSLocalizedString("Lava Burst", comment: "Dashboard background option")
         case .auroraGlow: return NSLocalizedString("Aurora Glow", comment: "Dashboard background option")
-        case .forestEmerald: return NSLocalizedString("Forest Emerald", comment: "Dashboard background option")
+        case .virentia: return NSLocalizedString("Virentia", comment: "Dashboard background option")
         case .pinkNebula: return NSLocalizedString("Pink Nebula", comment: "Dashboard background option")
-        case .cosmicPurple: return NSLocalizedString("Cosmic Purple", comment: "Dashboard background option")
+        case .cosmicPurple: return NSLocalizedString("Cosmic", comment: "Dashboard background option")
         }
     }
 
@@ -91,20 +91,22 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
             : Color.black.opacity(0.9)
     }
 
-    var secondaryTextColor: Color {
+    func secondaryTextColor(for scheme: ColorScheme) -> Color {
         switch self {
-        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
+        case .melloYellow, .сyberSplash, .frescoCrush:
+            return scheme == .dark ? Color.white.opacity(0.78) : Color.black.opacity(0.7)
+        case .sunrise, .classic, .iceCrystal, .coralSunset, .auroraGlow:
             return Color.black.opacity(0.7)
-        case .ocean, .forest, .oceanDeep, .cosmicPurple, .lavaBurst, .forestEmerald, .pinkNebula:
+        case .ocean, .forest, .oceanDeep, .cosmicPurple, .lavaBurst, .virentia, .pinkNebula:
             return Color.white.opacity(0.78)
         }
     }
 
     var circleTextColor: Color {
         switch self {
-        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
+        case .sunrise, .melloYellow, .classic, .сyberSplash, .iceCrystal, .coralSunset, .auroraGlow, .frescoCrush:
             return Color.black.opacity(0.85)
-        case .ocean, .forest, .oceanDeep, .cosmicPurple, .lavaBurst, .forestEmerald, .pinkNebula:
+        case .ocean, .forest, .oceanDeep, .cosmicPurple, .lavaBurst, .virentia, .pinkNebula:
             return Color.white.opacity(0.95)
         }
     }
@@ -120,10 +122,10 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 1.00, green: 0.74, blue: 0.22),
                 Color(red: 0.98, green: 0.58, blue: 0.16),
             ]
-        case .amber:
+        case .melloYellow:
             return [
-                Color(red: 1.00, green: 0.63, blue: 0.29),
-                Color(red: 0.93, green: 0.34, blue: 0.20),
+                Color(red: 0.341, green: 0.78, blue: 0.522), // #57c785
+                Color(red: 0.949, green: 1, blue: 0), // #f2ff00
             ]
         case .ocean:
             return [
@@ -135,10 +137,11 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.33, green: 0.71, blue: 0.47),
                 Color(red: 0.11, green: 0.40, blue: 0.24),
             ]
-        case .sunsetAura:
+        case .classic:
             return [
-                Color(red: 1.00, green: 0.37, blue: 0.43),
-                Color(red: 1.00, green: 0.76, blue: 0.44),
+                Color(red: 0.749, green: 0.733, blue: 0.733), // #bfbbbb
+                Color(red: 0.902, green: 0.902, blue: 0.902), // #e6e6e6
+                Color(red: 0.529, green: 0.529, blue: 0.529), // #878787
             ]
         case .oceanDeep:
             return [
@@ -150,11 +153,10 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.50, green: 0.00, blue: 1.00),
                 Color(red: 0.88, green: 0.00, blue: 1.00),
             ]
-        case .mintBreeze:
+        case .сyberSplash:
             return [
-                Color(red: 0.46, green: 0.93, blue: 0.78),
-                Color(red: 0.37, green: 0.87, blue: 0.66),
-                Color(red: 0.24, green: 0.86, blue: 0.59),
+                Color(red: 0.282, green: 0.957, blue: 0.969), // #48f4f7 
+                Color(red: 0.878, green: 0.282, blue: 0.969), // #e048f7
             ]
         case .lavaBurst:
             return [
@@ -176,15 +178,15 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.00, green: 0.96, blue: 0.63),
                 Color(red: 0.00, green: 0.85, blue: 0.96),
             ]
-        case .forestEmerald:
+        case .virentia:
             return [
                 Color(red: 0.07, green: 0.60, blue: 0.56),
                 Color(red: 0.22, green: 0.94, blue: 0.49),
             ]
-        case .skyMorning:
+        case .frescoCrush:
             return [
-                Color(red: 0.31, green: 0.67, blue: 1.00),
-                Color(red: 0.00, green: 0.95, blue: 0.99),
+                Color(red: 1, green: 0.867, blue: 0), // #ffdd00
+                Color(red: 0.569, green: 0.259, blue: 0.839), // #9142d6
             ]
         case .pinkNebula:
             return [
@@ -201,10 +203,10 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.60, green: 0.44, blue: 0.13),
                 Color(red: 0.59, green: 0.35, blue: 0.10),
             ]
-        case .amber:
+        case .melloYellow:
             return [
-                Color(red: 0.60, green: 0.38, blue: 0.17),
-                Color(red: 0.56, green: 0.20, blue: 0.12),
+                Color(red: 0.20, green: 0.52, blue: 0.39),
+                Color(red: 0.72, green: 0.55, blue: 0.10),
             ]
         case .ocean:
             return [
@@ -216,10 +218,11 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.20, green: 0.43, blue: 0.28),
                 Color(red: 0.07, green: 0.24, blue: 0.14),
             ]
-        case .sunsetAura:
+        case .classic:
             return [
-                Color(red: 0.60, green: 0.22, blue: 0.26),
-                Color(red: 0.60, green: 0.46, blue: 0.26),
+                Color(red: 0.2, green: 0.173, blue: 0.173), // #332c2c
+                Color(red: 0.349, green: 0.341, blue: 0.341), // #595757
+                Color(red: 0.102, green: 0.102, blue: 0.102), // #1a1a1a
             ]
         case .oceanDeep:
             return [
@@ -231,11 +234,11 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.30, green: 0.00, blue: 0.60),
                 Color(red: 0.53, green: 0.00, blue: 0.60),
             ]
-        case .mintBreeze:
+        case .сyberSplash:
             return [
-                Color(red: 0.28, green: 0.56, blue: 0.47),
-                Color(red: 0.22, green: 0.52, blue: 0.40),
-                Color(red: 0.14, green: 0.52, blue: 0.35),
+                Color(red: 0.05, green: 0.42, blue: 0.52),
+                Color(red: 0.13, green: 0.14, blue: 0.40),
+                Color(red: 0.36, green: 0.10, blue: 0.47),
             ]
         case .lavaBurst:
             return [
@@ -257,15 +260,15 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.00, green: 0.58, blue: 0.38),
                 Color(red: 0.00, green: 0.51, blue: 0.58),
             ]
-        case .forestEmerald:
+        case .virentia:
             return [
                 Color(red: 0.04, green: 0.36, blue: 0.34),
                 Color(red: 0.13, green: 0.56, blue: 0.29),
             ]
-        case .skyMorning:
+        case .frescoCrush:
             return [
-                Color(red: 0.19, green: 0.40, blue: 0.60),
-                Color(red: 0.00, green: 0.57, blue: 0.59),
+                Color(red: 0.18, green: 0.12, blue: 0.31),
+                Color(red: 0.73, green: 0.49, blue: 0.13),
             ]
         case .pinkNebula:
             return [
@@ -282,7 +285,7 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 1.00, green: 0.66, blue: 0.20),
                 Color(red: 0.98, green: 0.53, blue: 0.13),
             ]
-        case .amber:
+        case .melloYellow:
             return [
                 Color(red: 1.00, green: 0.48, blue: 0.18),
                 Color(red: 0.98, green: 0.30, blue: 0.14),
@@ -297,7 +300,7 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.63, green: 0.87, blue: 0.58),
                 Color(red: 0.20, green: 0.55, blue: 0.35),
             ]
-        case .sunsetAura:
+        case .classic:
             return [
                 Color(red: 1.00, green: 0.46, blue: 0.52),
                 Color(red: 1.00, green: 0.80, blue: 0.52),
@@ -312,7 +315,7 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.64, green: 0.10, blue: 1.00),
                 Color(red: 0.96, green: 0.36, blue: 1.00),
             ]
-        case .mintBreeze:
+        case .сyberSplash:
             return [
                 Color(red: 0.51, green: 0.94, blue: 0.80),
                 Color(red: 0.29, green: 0.85, blue: 0.63),
@@ -337,12 +340,12 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
                 Color(red: 0.05, green: 0.98, blue: 0.69),
                 Color(red: 0.00, green: 0.80, blue: 0.86),
             ]
-        case .forestEmerald:
+        case .virentia:
             return [
                 Color(red: 0.12, green: 0.66, blue: 0.58),
                 Color(red: 0.31, green: 0.93, blue: 0.58),
             ]
-        case .skyMorning:
+        case .frescoCrush:
             return [
                 Color(red: 0.41, green: 0.74, blue: 1.00),
                 Color(red: 0.09, green: 0.86, blue: 0.99),

@@ -65,6 +65,16 @@ final class OnboardingViewModel: ObservableObject {
         refreshValidation()
     }
 
+    func apply(profile: NicotineProfile) {
+        selectedMethod = profile.method
+        cigarettesConfig = profile.cigarettes ?? CigarettesConfig(currency: profile.selectedCurrency)
+        disposableVapeConfig = profile.disposableVape ?? DisposableVapeConfig(currency: profile.selectedCurrency)
+        refillableVapeConfig = profile.refillableVape ?? RefillableVapeConfig(currency: profile.selectedCurrency)
+        heatedTobaccoConfig = profile.heatedTobacco ?? HeatedTobaccoConfig(currency: profile.selectedCurrency)
+        snusConfig = profile.snus ?? SnusConfig(currency: profile.selectedCurrency)
+        refreshValidation()
+    }
+
     func currency(for method: NicotineMethod) -> Currency {
         switch method {
         case .cigarettes: return cigarettesConfig.currency

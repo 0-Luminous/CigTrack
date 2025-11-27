@@ -26,7 +26,7 @@ struct CalendarScreen: View {
     private var primaryTextColor: Color {
         backgroundStyle.primaryTextColor(for: colorScheme)
     }
-    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor }
+    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor(for: colorScheme) }
     private func style(for scheme: ColorScheme) -> DashboardBackgroundStyle {
         ensureAppearanceMigration()
         let index = scheme == .dark ? backgroundIndexDark : backgroundIndexLight
@@ -498,7 +498,7 @@ private struct DailyDetailSheet: View {
                                     .foregroundStyle(primaryTextColor)
                                 Text(consumptionDescription(for: entry))
                                     .font(.caption)
-                                    .foregroundStyle(backgroundStyle.secondaryTextColor)
+                                    .foregroundStyle(primaryTextColor)
                             }
                             .padding(.vertical, 6)
                             .listRowBackground(Color.clear)

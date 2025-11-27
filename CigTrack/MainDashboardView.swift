@@ -282,7 +282,7 @@ private extension MainDashboardView {
 
     var statCardBackgroundColor: Color {
         switch backgroundStyle {
-        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
+        case .sunrise, .melloYellow, .classic, .сyberSplash, .iceCrystal, .coralSunset, .auroraGlow, .frescoCrush:
             return Color.white.opacity(0.55)
         default:
             return Color.white.opacity(0.12)
@@ -291,7 +291,7 @@ private extension MainDashboardView {
 
     var statCardBorderColor: Color {
         switch backgroundStyle {
-        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
+        case .sunrise, .melloYellow, .classic, .сyberSplash, .iceCrystal, .coralSunset, .auroraGlow, .frescoCrush:
             return Color.black.opacity(0.08)
         default:
             return Color.white.opacity(0.28)
@@ -300,7 +300,7 @@ private extension MainDashboardView {
 
     var statCardShadowColor: Color {
         switch backgroundStyle {
-        case .sunrise, .amber, .sunsetAura, .mintBreeze, .iceCrystal, .coralSunset, .auroraGlow, .skyMorning:
+        case .sunrise, .melloYellow, .classic, .сyberSplash, .iceCrystal, .coralSunset, .auroraGlow, .frescoCrush:
             return Color.black.opacity(0.15)
         default:
             return Color.black.opacity(0.35)

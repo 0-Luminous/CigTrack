@@ -15,7 +15,7 @@ struct CurrencyPickerSheet: View {
     private var backgroundStyle: DashboardBackgroundStyle { style(for: colorScheme) }
     private var backgroundGradient: LinearGradient { backgroundStyle.backgroundGradient(for: colorScheme) }
     private var primaryTextColor: Color { backgroundStyle.primaryTextColor(for: colorScheme) }
-    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor }
+    private var secondaryTextColor: Color { backgroundStyle.secondaryTextColor(for: colorScheme) }
 
     var body: some View {
         ZStack {

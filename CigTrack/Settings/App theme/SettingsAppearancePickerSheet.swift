@@ -82,7 +82,7 @@ struct SettingsAppearancePickerSheet: View {
             }
         }
         .presentationDetents([.large])
-        .preferredColorScheme(appearancePickerMode)
+        .preferredColorSchemeIfNeeded(appearancePickerMode)
         .onAppear {
             appearancePickerMode = Self.preferredColorScheme(from: appPreferredColorSchemeRaw)
         }

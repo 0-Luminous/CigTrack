@@ -23,25 +23,31 @@ enum DashboardBackgroundStyle: Int, CaseIterable, Identifiable {
         scheme == .dark ? defaultDark : `default`
     }
 
-    static let appearanceOptions: [DashboardBackgroundStyle] = [
-        .classic,
-        .coralSunset,
-        .sunrise,
-        .melloYellow,
-        .lavaBurst,
-        .pinkNebula,
-        .cosmicPurple,
-        .oceanDeep,
-        .ocean,
-        .frescoCrush,
-        .iceCrystal,
-        .forest,
-        .auroraGlow,
-        .сyberSplash,
-        .virentia,
-    ]
+    static let appearanceOptions: [DashboardBackgroundStyle] =
+        DashboardBackgroundStyle.allCases.sorted { $0.colorSortOrder < $1.colorSortOrder }
 
     var id: Int { rawValue }
+
+    // Sort by dominant hue so the picker groups similar gradients together.
+    private var colorSortOrder: Int {
+        switch self {
+        case .coralSunset: return 20
+        case .sunrise: return 40
+        case .frescoCrush: return 60
+        case .forest: return 140
+        case .melloYellow: return 145
+        case .auroraGlow: return 160
+        case .virentia: return 175
+        case .сyberSplash: return 181
+        case .oceanDeep: return 195
+        case .ocean: return 208
+        case .iceCrystal: return 216
+        case .cosmicPurple: return 270
+        case .pinkNebula: return 331
+        case .lavaBurst: return 347
+        case .classic: return 1000
+        }
+    }
 
     var name: String {
         switch self {

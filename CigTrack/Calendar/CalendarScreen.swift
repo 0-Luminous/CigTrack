@@ -51,8 +51,10 @@ struct CalendarScreen: View {
                                 selection: $monthAnchor,
                                 selectedColor: primaryTextColor,
                                 unselectedColor: secondaryTextColor)
+                        .foregroundStyle(primaryTextColor)
 
                     WeekdayHeader(textColor: secondaryTextColor)
+                        .foregroundStyle(primaryTextColor)
                         .padding(.vertical, 8)
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                         .glassEffect(.clear)
@@ -61,17 +63,21 @@ struct CalendarScreen: View {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 7), spacing: 12) {
                         ForEach(Array(gridDays.enumerated()), id: \.offset) { _, day in
                             if let date = day {
+                                let dayCount = count(for: date)
+                                let isAvailable = isDayAvailable(date)
                                 Button {
                                     selectedDay = DaySelection(date: date)
                                 } label: {
                                     CalendarDayCell(date: date,
-                                                    count: count(for: date),
+                                                    count: dayCount,
                                                     limit: limit,
                                                     isToday: Calendar.current.isDateInToday(date),
                                                     isInCurrentMonth: Calendar.current.isDate(date, equalTo: monthAnchor, toGranularity: .month),
-                                                    labelColor: primaryTextColor)
+                                                    labelColor: primaryTextColor,
+                                                    isAvailable: isAvailable)
                                 }
                                 .buttonStyle(.plain)
+                                .disabled(!isAvailable)
                             } else {
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                                     .fill(Color.white.opacity(0.02))
@@ -226,6 +232,18 @@ struct CalendarScreen: View {
         return (0..<12).compactMap { calendar.date(byAdding: .month, value: $0, to: startOfYear) }
     }
 
+    private var creationStartDate: Date {
+        Calendar.current.startOfDay(for: user.createdAt ?? Date())
+    }
+
+    private var todayStart: Date {
+        Calendar.current.startOfDay(for: Date())
+    }
+
+    private func isDayAvailable(_ date: Date) -> Bool {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        return startOfDay >= creationStartDate && startOfDay <= todayStart
+    }
 }
 
 private struct CalendarDayCell: View {
@@ -235,6 +253,7 @@ private struct CalendarDayCell: View {
     let isToday: Bool
     let isInCurrentMonth: Bool
     let labelColor: Color
+    let isAvailable: Bool
 
     var body: some View {
         let cardShape = RoundedRectangle(cornerRadius: 30, style: .continuous)
@@ -283,7 +302,7 @@ private struct CalendarDayCell: View {
         .clipShape(cardShape)
         .glassEffect(.clear)
         .shadow(color: .black.opacity(0.25 * (isInCurrentMonth ? 0.15 : 0.05)), radius: 6, x: 0, y: 4)
-        .opacity(isInCurrentMonth ? 1.0 : 0.5)
+        .opacity(overallOpacity)
         .accessibilityElement()
         .accessibilityLabel(accessibilityText)
     }
@@ -298,6 +317,12 @@ private struct CalendarDayCell: View {
         if count <= limit { return .green }
         if count <= Int(Double(limit) * 1.25) { return .orange }
         return .red
+    }
+
+    private var overallOpacity: Double {
+        let monthOpacity = isInCurrentMonth ? 1.0 : 0.5
+        let availabilityOpacity = isAvailable ? 1.0 : 0.35
+        return monthOpacity * availabilityOpacity
     }
 
     private var accessibilityText: Text {
@@ -420,7 +445,12 @@ private struct MonthChip: View {
 
 // Weekday header, localized and ordered by user’s firstWeekday
 private struct WeekdayHeader: View {
+    @Environment(\.colorScheme) private var colorScheme
     let textColor: Color
+
+    private var effectiveTextColor: Color {
+        colorScheme == .dark ? .white : .black
+    }
 
     private var symbols: [String] {
         let calendar = Calendar.current
@@ -441,7 +471,7 @@ private struct WeekdayHeader: View {
                 Text(symbol)
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundStyle(textColor.opacity(0.85))
+                    .foregroundStyle(effectiveTextColor.opacity(0.85))
                     .frame(maxWidth: .infinity)
             }
         }

@@ -58,22 +58,28 @@ struct StatsScreen: View {
             Text("stats_chart_weekly_trend")
                 .font(.headline)
 
-            Chart(weeklyData) { point in
-                LineMark(
-                    x: .value(localized("stats_chart_axis_day"), point.date, unit: .day),
-                    y: .value(localized("stats_chart_axis_count"), point.count)
-                )
-                .foregroundStyle(Color.accentColor)
+            if weeklyData.isEmpty {
+                Text("stats_chart_more_data_needed")
+                    .frame(maxWidth: .infinity, minHeight: 200, alignment: .center)
+                    .foregroundStyle(.secondary)
+            } else {
+                Chart(weeklyData) { point in
+                    LineMark(
+                        x: .value(localized("stats_chart_axis_day"), point.date, unit: .day),
+                        y: .value(localized("stats_chart_axis_count"), point.count)
+                    )
+                    .foregroundStyle(Color.accentColor)
 
-                AreaMark(
-                    x: .value(localized("stats_chart_axis_day"), point.date, unit: .day),
-                    y: .value(localized("stats_chart_axis_count"), point.count)
-                )
-                .foregroundStyle(LinearGradient(colors: [.accentColor.opacity(0.6), .clear], startPoint: .top, endPoint: .bottom))
-            }
-            .frame(height: 200)
-            .chartYAxis {
-                AxisMarks(position: .leading)
+                    AreaMark(
+                        x: .value(localized("stats_chart_axis_day"), point.date, unit: .day),
+                        y: .value(localized("stats_chart_axis_count"), point.count)
+                    )
+                    .foregroundStyle(LinearGradient(colors: [.accentColor.opacity(0.6), .clear], startPoint: .top, endPoint: .bottom))
+                }
+                .frame(height: 200)
+                .chartYAxis {
+                    AxisMarks(position: .leading)
+                }
             }
         }
         .padding()

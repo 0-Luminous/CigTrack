@@ -58,6 +58,7 @@
 "stats_chart_weekly_trend" = "Недельная динамика";
 "stats_chart_axis_day" = "День";
 "stats_chart_axis_count" = "Количество";
+"stats_chart_more_data_needed" = "Для статистики требуется больше данных";
 "stats_financial_title" = "Финансовый обзор";
 "stats_financial_subtitle" = "За последние 30 дней";
 "stats_financial_limit_label" = "Месячный лимит";

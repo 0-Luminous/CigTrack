@@ -25,9 +25,20 @@ struct PuffQuestApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .preferredColorScheme(preferredColorScheme)
+                .preferredColorSchemeIfNeeded(preferredColorScheme)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(appViewModel)
+        }
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func preferredColorSchemeIfNeeded(_ scheme: ColorScheme?) -> some View {
+        if let scheme {
+            preferredColorScheme(scheme)
+        } else {
+            self
         }
     }
 }

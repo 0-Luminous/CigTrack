@@ -518,25 +518,48 @@ private struct DailyDetailSheet: View {
                 backgroundGradient
                     .ignoresSafeArea()
 
-                List {
-                    Section(header: Text(formattedDate)
-                        .foregroundStyle(primaryTextColor)) {
-                        ForEach(entries) { entry in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(timeString(for: entry.createdAt ?? Date()))
-                                    .font(.headline)
-                                    .foregroundStyle(primaryTextColor)
-                                Text(consumptionDescription(for: entry))
-                                    .font(.caption)
-                                    .foregroundStyle(primaryTextColor)
-                            }
-                            .padding(.vertical, 6)
-                            .listRowBackground(Color.clear)
-                        }
+                if entries.isEmpty {
+                    VStack(spacing: 16) {
+                        Spacer()
+
+                        Image("men")
+                            .resizable()
+                            .scaledToFit()
+                            .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 22))
+                            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                            .frame(maxWidth:.infinity)
+                            .padding(.horizontal, 20)
+                            .opacity(0.85)
+
+                        Text("Отличная работа!\n Сегодня без никотина.")
+                            .font(.headline)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(primaryTextColor)
+                            .padding(.horizontal, 24)
+
+                        Spacer()
                     }
-                    .listRowBackground(Color.clear)
+                } else {
+                    List {
+                        Section(header: Text(formattedDate)
+                            .foregroundStyle(primaryTextColor)) {
+                            ForEach(entries) { entry in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(timeString(for: entry.createdAt ?? Date()))
+                                        .font(.headline)
+                                        .foregroundStyle(primaryTextColor)
+                                    Text(consumptionDescription(for: entry))
+                                        .font(.caption)
+                                        .foregroundStyle(primaryTextColor)
+                                }
+                                .padding(.vertical, 6)
+                                .listRowBackground(Color.clear)
+                            }
+                        }
+                        .listRowBackground(Color.clear)
+                    }
+                    .scrollContentBackground(.hidden)
                 }
-                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Day details")
             .toolbar {

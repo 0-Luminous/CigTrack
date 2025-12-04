@@ -488,6 +488,7 @@ private struct DailyDetailSheet: View {
     let date: Date
     let entryType: EntryType
     private let methodLabel: String?
+    private let methodIconName: String?
 
     @FetchRequest private var entries: FetchedResults<Entry>
     @AppStorage("dashboardBackgroundIndex") private var legacyBackgroundIndex: Int = DashboardBackgroundStyle.default.rawValue
@@ -500,6 +501,7 @@ private struct DailyDetailSheet: View {
         self.date = date
         self.entryType = entryType
         self.methodLabel = DailyDetailSheet.resolveMethodLabel()
+        self.methodIconName = DailyDetailSheet.resolveMethodIconName()
 
         let calendar = Calendar.current
         let start = calendar.startOfDay(for: date) as NSDate
@@ -544,13 +546,23 @@ private struct DailyDetailSheet: View {
                         Section(header: Text(formattedDate)
                             .foregroundStyle(primaryTextColor)) {
                             ForEach(entries) { entry in
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(timeString(for: entry.createdAt ?? Date()))
-                                        .font(.headline)
-                                        .foregroundStyle(primaryTextColor)
-                                    Text(consumptionDescription(for: entry))
-                                        .font(.caption)
-                                        .foregroundStyle(primaryTextColor)
+                                HStack(alignment: .center, spacing: 12) {
+                                    if let iconName = methodIconName {
+                                        Image(iconName)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                            .frame(width: 50, height: 50)
+                                    }
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(timeString(for: entry.createdAt ?? Date()))
+                                            .font(.headline)
+                                            .foregroundStyle(primaryTextColor)
+                                        Text(consumptionDescription(for: entry))
+                                            .font(.caption)
+                                            .foregroundStyle(primaryTextColor)
+                                    }
                                 }
                                 .padding(.vertical, 6)
                                 .listRowBackground(Color.clear)
@@ -603,6 +615,11 @@ private struct DailyDetailSheet: View {
         let store = InMemorySettingsStore()
         guard let method = store.loadProfile()?.method else { return nil }
         return NSLocalizedString(method.localizationKey, comment: "nicotine method label")
+    }
+
+    private static func resolveMethodIconName() -> String? {
+        let store = InMemorySettingsStore()
+        return store.loadProfile()?.method.iconAssetName
     }
 
     private var backgroundStyle: DashboardBackgroundStyle {

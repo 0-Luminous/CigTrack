@@ -35,6 +35,7 @@ struct MainDashboardView: View {
     @State private var pendingDecrementTap = false
     @State private var isCurrentHoldDecrement = false
     @State private var pendingDecrementResetWorkItem: DispatchWorkItem?
+    @State private var currentMethod: NicotineMethod?
 
     private var entryType: EntryType { user.product.entryType }
     private var dailyLimit: Int { max(Int(user.dailyLimit), 0) }
@@ -108,6 +109,7 @@ struct MainDashboardView: View {
             .onAppear {
                 now = Date()
                 refreshToday(reference: now)
+                refreshCurrentMethod()
                 startBreathingAnimation()
             }
             .onDisappear {
@@ -124,6 +126,11 @@ struct MainDashboardView: View {
                 now = time
                 if currentDay != previousDay {
                     refreshToday(reference: time)
+                }
+            }
+            .onChange(of: showSettings) { isPresented in
+                if !isPresented {
+                    refreshCurrentMethod()
                 }
             }
             .navigationTitle("")
@@ -319,7 +326,7 @@ private extension MainDashboardView {
         let remaining = max(dailyLimit - todayCount, 0)
         return String.localizedStringWithFormat(
             NSLocalizedString("%1$@ LEFT TODAY: %2$d/%3$d", comment: "Remaining entries label"),
-            entryTypeLabel,
+            nicotineMethodLabel,
             remaining,
             dailyLimit
         )
@@ -350,6 +357,29 @@ private extension MainDashboardView {
         case .cig: return NSLocalizedString("CIGARETTES", comment: "cigarettes label")
         case .puff: return NSLocalizedString("PUFFS", comment: "puffs label")
         }
+    }
+
+    var nicotineMethodLabel: String {
+        guard let method = currentMethod else { return entryTypeLabel }
+        if method == .disposableVape || method == .refillableVape {
+            return "осталось затяжек".uppercased()
+        }
+        let key: String
+        switch method {
+        case .cigarettes:
+            key = "onboarding_method_cigarettes"
+        case .heatedTobacco:
+            key = "onboarding_method_heated_tobacco"
+        case .snusOrPouches:
+            key = "onboarding_method_snus_or_pouches"
+        case .disposableVape, .refillableVape:
+            key = "onboarding_method_disposable_vape"
+        }
+        return NSLocalizedString(key, comment: "nicotine method label").uppercased()
+    }
+
+    func refreshCurrentMethod() {
+        currentMethod = InMemorySettingsStore().loadProfile()?.method
     }
 
     var trialStatusText: String {

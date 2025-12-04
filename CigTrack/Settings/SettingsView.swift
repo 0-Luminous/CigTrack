@@ -26,6 +26,7 @@ struct SettingsView: View {
 
     @State private var showMethodManager = false
     private let savedMethodsStore = SavedMethodsStore()
+    private let onboardingStore = InMemorySettingsStore()
     private var backgroundStyle: DashboardBackgroundStyle {
         style(for: colorScheme)
     }
@@ -399,7 +400,6 @@ private extension SettingsView {
     }
 
     private func refreshStoredProfiles() {
-        let onboardingStore = InMemorySettingsStore()
         let latestOnboardingProfile = onboardingStore.loadProfile()
         storedProfiles = savedMethodsStore.mergeLatestOnboardingProfile(latestOnboardingProfile)
     }
@@ -411,6 +411,7 @@ private extension SettingsView {
         if persist {
             savedMethodsStore.save(profile: profile)
         }
+        try? onboardingStore.save(profile: profile)
         refreshStoredProfiles()
     }
 
